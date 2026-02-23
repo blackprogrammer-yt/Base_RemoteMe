@@ -67,6 +67,21 @@ export function NavMain() {
             icon: Users,
         },
         {
+            title: "Users",
+            url: "/admin/users",
+            icon: Users,
+        },
+        {
+            title: "Contract",
+            url: "/admin/contract",
+            icon: Users,
+        },
+        {
+            title: "SignUp Request",
+            url: "/admin/signup-request",
+            icon: Users,
+        },
+        {
             title: "Login",
             url: "/",
             icon: LogIn,

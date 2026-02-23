@@ -2,6 +2,11 @@ import { jsx as _jsx } from "react/jsx-runtime";
 import WorkspaceDashboard from "@/page/workspace/Dashboard";
 import AdminDashboard from "@/page/admin/dashboard";
 import OrganizationList from "@/page/admin/origanizations/OrganizationList";
+import UserList from "@/page/admin/users/UserList";
+import UserEdit from "@/page/admin/users/UserEdit";
+import Contract from "@/page/admin/contract/Contract";
+import UserDetail from "@/page/admin/contract/UserDetail";
+import SignUpRequest from "@/page/admin/signUpRequest/SignUpRequest";
 import Members from "@/page/workspace/Members";
 import ProjectDetails from "@/page/workspace/ProjectDetails";
 import Settings from "@/page/workspace/Settings";
@@ -22,6 +27,26 @@ export const protectedRoutePaths = [
     {
         path: PROTECTED_ROUTES.ADMIN_ORGANIZATIONS,
         element: _jsx(OrganizationList, {}),
+    },
+    {
+        path: PROTECTED_ROUTES.ADMIN_USERS,
+        element: _jsx(UserList, {}),
+    },
+    {
+        path: PROTECTED_ROUTES.ADMIN_USER_EDIT,
+        element: _jsx(UserEdit, {}),
+    },
+    {
+        path: PROTECTED_ROUTES.ADMIN_CONTRACT,
+        element: _jsx(Contract, {}),
+    },
+    {
+        path: PROTECTED_ROUTES.ADMIN_CONTRACT_DETAIL,
+        element: _jsx(UserDetail, {}),
+    },
+    {
+        path: PROTECTED_ROUTES.ADMIN_SIGNUP_REQUEST,
+        element: _jsx(SignUpRequest, {}),
     },
 ];
 export const baseRoutePaths = [
