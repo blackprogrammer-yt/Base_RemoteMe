@@ -1,25 +1,20 @@
 import { jsx as _jsx } from "react/jsx-runtime";
 import { createContext, useContext } from "react";
-import useWorkspaceId from "@/hooks/use-workspace-id";
-import useGetWorkspaceQuery from "@/hooks/api/use-get-workspace";
 const AuthContext = createContext(undefined);
 export const AuthProvider = ({ children, }) => {
-    const workspaceId = useWorkspaceId();
-    const { data: workspaceData, isLoading: workspaceLoading, error: workspaceError, refetch: refetchWorkspace, } = useGetWorkspaceQuery(workspaceId);
-    const workspace = workspaceData?.workspace;
     const user = undefined;
     const hasPermission = (_permission) => true;
     return (_jsx(AuthContext.Provider, {
         value: {
             user,
-            workspace,
+            workspace: undefined,
             hasPermission,
-            error: workspaceError,
+            error: null,
             isLoading: false,
             isFetching: false,
-            workspaceLoading,
+            workspaceLoading: false,
             refetchAuth: () => undefined,
-            refetchWorkspace,
+            refetchWorkspace: () => undefined,
         }, children: children
     }));
 };

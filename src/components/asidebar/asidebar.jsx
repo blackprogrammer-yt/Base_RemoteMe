@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { EllipsisIcon, Loader, LogOut } from "lucide-react";
 import {
     Sidebar,
@@ -25,16 +24,13 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Logo from "@/components/logo";
 import LogoutDialog from "./logout-dialog";
-import { WorkspaceSwitcher } from "./workspace-switcher";
 import { NavMain } from "./nav-main";
 import { Separator } from "../ui/separator";
-import useWorkspaceId from "@/hooks/use-workspace-id";
 import { useAuthContext } from "@/context/auth-provider";
 
 const Asidebar = () => {
     const { isLoading, user } = useAuthContext();
     const { open } = useSidebar();
-    const workspaceId = useWorkspaceId();
     const [isOpen, setIsOpen] = useState(false);
 
     return (
@@ -42,14 +38,13 @@ const Asidebar = () => {
             <Sidebar collapsible="icon">
                 <SidebarHeader className="!py-0 dark:bg-background">
                     <div className="flex h-[50px] w-full items-center justify-start px-1">
-                        <Logo url={`/workspace/${workspaceId}`} />
+                        <Logo />
                         {open && (
-                            <Link
-                                to={`/workspace/${workspaceId}`}
+                            <span
                                 className="ml-2 hidden items-center gap-2 self-center font-medium md:flex"
                             >
-                                PM-Tool
-                            </Link>
+                                Ultimate Work
+                            </span>
                         )}
                     </div>
                 </SidebarHeader>
@@ -57,8 +52,6 @@ const Asidebar = () => {
                 <SidebarContent className="!mt-0 dark:bg-background">
                     <SidebarGroup className="!py-0">
                         <SidebarGroupContent>
-                            <WorkspaceSwitcher />
-                            <Separator />
                             <NavMain />
                         </SidebarGroupContent>
                     </SidebarGroup>

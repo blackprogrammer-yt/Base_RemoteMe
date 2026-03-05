@@ -49,7 +49,7 @@ const ForgotPassword = () => {
             <div className="flex w-full max-w-sm flex-col gap-6">
                 <Link to="/" className="flex items-center gap-2 self-center font-medium">
                     <Logo />
-                    Team Sync.
+                    Ultimate Work
                 </Link>
 
                 <div className="flex flex-col gap-6">

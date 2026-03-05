@@ -7,20 +7,15 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import useWorkspaceId from "@/hooks/use-workspace-id";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { Separator } from "./ui/separator";
 
 const Header = () => {
     const location = useLocation();
-    const workspaceId = useWorkspaceId();
     const pathname = location.pathname;
 
     const getPageLabel = (currentPathname) => {
         if (currentPathname.includes("/project/")) return "Project";
-        if (currentPathname.includes("/settings")) return "Settings";
-        if (currentPathname.includes("/tasks")) return "Tasks";
-        if (currentPathname.includes("/members")) return "Members";
         return null;
     };
 
@@ -37,7 +32,7 @@ const Header = () => {
                         <BreadcrumbItem className="hidden text-[15px] md:block">
                             {pageHeading ? (
                                 <BreadcrumbLink asChild>
-                                    <Link to={`/workspace/${workspaceId}`}>Dashboard</Link>
+                                    <span>Dashboard</span>
                                 </BreadcrumbLink>
                             ) : (
                                 <BreadcrumbPage className="line-clamp-1">

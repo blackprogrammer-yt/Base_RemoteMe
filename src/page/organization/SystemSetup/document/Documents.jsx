@@ -13,6 +13,7 @@ import {
 	Plus,
 	Search,
 	SlidersHorizontal,
+	SquarePen,
 	X,
 } from "lucide-react";
 
@@ -273,12 +274,13 @@ const Documents = () => {
 						type="button"
 						variant="outline"
 						size="sm"
-						className="gap-2 px-3 text-xs"
+						className="w-full gap-2 px-3 text-xs"
 						onClick={() =>
 							navigate(PROTECTED_ROUTES.ORGANIZATION_SYSTEM_SETUP_DOCUMENT_EDIT)
 						}
 					>
-						Edit
+						<SquarePen className="h-3.5 w-3.5" />
+						<span>Edit</span>
 					</Button>
 				</TableCell>
 			);
@@ -485,7 +487,8 @@ const Documents = () => {
 															navigate(PROTECTED_ROUTES.ORGANIZATION_SYSTEM_SETUP_DOCUMENT_EDIT)
 														}
 													>
-														Edit
+														<SquarePen className="h-3.5 w-3.5" />
+														<span>Edit</span>
 													</Button>
 												)}
 											</div>

@@ -12,6 +12,7 @@ import {
 	Plus,
 	Search,
 	SlidersHorizontal,
+	SquarePen,
 	X,
 } from "lucide-react";
 
@@ -212,14 +213,15 @@ const EarningAndDeduction = () => {
 						type="button"
 						variant="outline"
 						size="sm"
-						className="h-7 gap-2 px-2.5 text-xs"
+						className="gap-2 px-3 text-xs"
 						onClick={() =>
 							navigate(
 								PROTECTED_ROUTES.ORGANIZATION_SYSTEM_SETUP_EARNING_AND_DEDUCTION_EDIT,
 							)
 						}
 					>
-						Edit
+						<SquarePen className="h-3.5 w-3.5" />
+						<span>Edit</span>
 					</Button>
 				</TableCell>
 			);

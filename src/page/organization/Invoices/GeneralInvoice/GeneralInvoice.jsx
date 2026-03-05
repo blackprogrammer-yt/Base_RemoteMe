@@ -11,6 +11,7 @@ import {
 	Search,
 	SlidersHorizontal,
 	X,
+	Eye,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -263,13 +264,12 @@ const GeneralInvoice = () => {
 						type="button"
 						variant="outline"
 						size="sm"
-						className={`h-7 px-3 text-xs ${getActionClassName(
-							invoice.status
-						)}`}
+						className="gap-2 px-3 text-xs"
 						onClick={() =>
 							navigate(`/organization/invoices/general-invoices/${invoice.id}`)
 						}
 					>
+						<Eye className="h-3.5 w-3.5" />
 						{getActionLabel(invoice.status)}
 					</Button>
 				</TableCell>
@@ -531,13 +531,12 @@ const GeneralInvoice = () => {
 													type="button"
 													variant="outline"
 													size="sm"
-													className={`w-full gap-2 px-3 text-xs ${getActionClassName(
-														invoice.status
-													)}`}
+													className="w-full gap-2 px-3 text-xs"
 													onClick={() =>
 														navigate(`/organization/invoices/general-invoices/${invoice.id}`)
 													}
 												>
+													<Eye className="h-3.5 w-3.5" />
 													{getActionLabel(invoice.status)}
 												</Button>
 											</div>
