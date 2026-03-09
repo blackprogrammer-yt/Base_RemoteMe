@@ -1,208 +1,286 @@
 import {
-    FileText,
-    ArrowLeft,
-    Download,
+	ArrowLeft,
+	Download,
+	FileText,
+	Receipt,
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@/components/ui/table";
+
+const INVOICE = {
+	invoiceNo: "R00000022",
+	vat: "1234567890",
+	terms: "Net 30",
+	status: "Invoiced",
+	company: {
+		name: "Hunter Downs",
+		description: "Consectetur rerum es",
+		logoText: "HD",
+	},
+	billedBy: {
+		name: "Hunter Downs",
+		email: "payments@remoteme.com",
+		phone: "+1234567890",
+	},
+	billedTo: {
+		name: "Dhurandhar Casting Company",
+		contact: "Miller Mark",
+		email: "khan.shahab02729+miller@gmail.com",
+	},
+	invoiceDate: "Jan 20, 2026",
+	currency: "AED",
+	paymentDescription: "PENDING",
+};
+
+const INVOICE_ITEMS = [
+	{
+		id: 1,
+		description: "QA and AI work",
+		amount: "د.إ1200",
+	},
+];
+
+const PAYMENT_METHOD = [
+	{ label: "Bank", value: "Hillary Figueroa" },
+	{ label: "IBAN #", value: "12345678909876" },
+	{ label: "Account Title", value: "RemoteMe" },
+	{ label: "SWIFT Code", value: "12345" },
+	{ label: "Bank Address", value: "Quidem aliquip facil" },
+	{ label: "Bank Phone", value: "+1 (804) 459-2995" },
+];
 
 const GeneralInvoiceDetails = () => {
-    const navigate = useNavigate();
-    const { id } = useParams();
+	const navigate = useNavigate();
+	const { id } = useParams();
 
-    // Simulation of invoice data based on Image 2
-    const invoiceData = {
-        invoiceNo: "R00000022",
-        vatNo: "1234567890",
-        terms: "Net 30",
-        status: "invoiced",
-        invoiceDate: "Jan, 20 2026",
-        currency: "AED",
-        billedBy: {
-            name: "Hunter Downs",
-            tagline: "Consectetur rerum es",
-            email: "payments@remoteme.com",
-            phone: "+1234567890"
-        },
-        billedTo: {
-            organization: "Dhurandhar Casting Company",
-            contactPerson: "Miller Mark",
-            email: "khan.shahab02729+miller@gmail.com"
-        },
-        items: [
-            { id: 1, description: "QA and AI work", amount: 1200 }
-        ],
-        paymentMethod: {
-            bank: "Hillary Figueroa",
-            iban: "12345678909876",
-            accountTitle: "RemoteMe",
-            swiftCode: "12345",
-            bankAddress: "Quidem aliquip facil",
-            bankPhone: "+1 (804) 459-2995"
-        },
-        notes: "Please make payments within 30 days of the invoice date. Bank transfer details are provided below. Thank you for your business!"
-    };
 
-    return (
-        <main className="flex flex-1 flex-col gap-4 py-4 md:pt-3">
-            {/* Header */}
-            <div className="flex flex-auto flex-col py-2">
-                <div className="flex min-w-0 flex-auto flex-col gap-2 sm:flex-row sm:items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <FileText className="h-6 w-6 text-primary" />
-                        <h2 className="text-2xl font-bold tracking-tight text-slate-800">
-                            General Invoice Details
-                        </h2>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <Button 
-                            variant="outline" 
-                            className="border-emerald-200 text-emerald-600 hover:bg-emerald-50 rounded-md flex items-center gap-2 h-9"
-                        >
-                            <Download className="h-4 w-4" />
-                            Download Invoice
-                        </Button>
-                        <Button 
-                            onClick={() => navigate(-1)}
-                            className="bg-slate-900 hover:bg-slate-800 text-white border-none rounded-md flex items-center gap-2 px-4 h-9"
-                        >
-                            <ArrowLeft className="h-4 w-4" />
-                            Back
-                        </Button>
-                    </div>
-                </div>
-            </div>
+	return (
+		<main className="flex flex-1 flex-col gap-4 py-4 md:pt-3">
+			<div className="flex items-center justify-between">
+				<div className="flex items-center gap-2">
+					<div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+						<FileText className="h-4 w-4" />
+					</div>
+					<h2 className="text-lg font-semibold">General Invoice Detail</h2>
+				</div>
+				<div className="flex flex-wrap items-center gap-2">
+					<Button
+						variant="outline"
+						size="sm"
+						className="gap-2 border-emerald-200 text-emerald-600 hover:bg-emerald-50"
+					>
+						<Download className="h-4 w-4" />
+						Download Invoice
+					</Button>
+					<Button
+						onClick={() => navigate(-1)}
+						variant="default"
+						size="sm"
+						className="gap-2"
+					>
+						<ArrowLeft className="h-4 w-4" />
+						Back
+					</Button>
+				</div>
+			</div>
 
-            {/* Invoice Card */}
-            <Card className="rounded-xl border bg-card shadow-sm max-w-5xl mx-auto w-full overflow-hidden">
-                <CardContent className="p-12 text-slate-600">
-                    {/* Top Section: Logo and Invoice Info */}
-                    <div className="flex justify-between items-start mb-12">
-                        <div>
-                            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 overflow-hidden border">
-                                <img src="/logo-placeholder.png" alt="Logo" className="w-10 h-10 object-contain opacity-50" />
-                            </div>
-                            <h3 className="text-xl font-bold text-slate-900">{invoiceData.billedBy.name}</h3>
-                            <p className="text-sm text-slate-500 italic">{invoiceData.billedBy.tagline}</p>
-                        </div>
-                        <div className="text-right">
-                            <h1 className="text-4xl font-bold text-slate-900 mb-1 uppercase tracking-tight">Invoice</h1>
-                            <p className="font-medium text-slate-700">#{invoiceData.invoiceNo}</p>
-                            <div className="text-sm mt-2 space-y-0.5">
-                                <p><span className="text-slate-400">VAT #:</span> {invoiceData.vatNo}</p>
-                                <p><span className="text-slate-400">Terms:</span> {invoiceData.terms}</p>
-                            </div>
-                            <div className="mt-4">
-                                <Badge className="bg-sky-500/10 text-sky-700 border-0 uppercase text-[10px] font-bold px-3 py-1">
-                                    {invoiceData.status}
-                                </Badge>
-                            </div>
-                        </div>
-                    </div>
+			<Card className="shadow-sm">
+				<CardContent className="grid gap-6 p-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+					<div className="rounded-lg border bg-card p-5">
+						<div className="flex flex-wrap items-start justify-between gap-4">
+							<div className="flex items-center gap-3">
+								<div className="flex h-12 w-12 items-center justify-center rounded-full border bg-muted text-xs font-semibold text-muted-foreground">
+									{INVOICE.company.logoText}
+								</div>
+								<div>
+									<p className="text-sm font-semibold text-foreground">
+										{INVOICE.company.name}
+									</p>
+									<p className="text-xs text-muted-foreground">
+										{INVOICE.company.description}
+									</p>
+								</div>
+							</div>
+							<div className="text-right">
+								<p className="text-sm font-semibold text-foreground">INVOICE</p>
+								<p className="text-xs text-muted-foreground">
+									#{INVOICE.invoiceNo}
+								</p>
+								<p className="text-xs text-muted-foreground">
+									VAT: {INVOICE.vat}
+								</p>
+								<p className="text-xs text-muted-foreground">
+									Terms: {INVOICE.terms}
+								</p>
+								<Badge className="mt-2 inline-flex rounded-sm border-0 bg-sky-500/10 text-xs font-semibold uppercase text-sky-700">
+									{INVOICE.status}
+								</Badge>
+							</div>
+						</div>
 
-                    <div className="border-t border-slate-100 mb-10"></div>
+						<div className="my-4 border-b" />
 
-                    {/* Billed By / To Section */}
-                    <div className="grid grid-cols-2 gap-12 mb-12">
-                        <div>
-                            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Billed By:</h4>
-                            <div className="space-y-1">
-                                <p className="font-bold text-slate-900">{invoiceData.billedBy.name}</p>
-                                <p className="text-sm"><span className="text-slate-400">Email:</span> {invoiceData.billedBy.email}</p>
-                                <p className="text-sm"><span className="text-slate-400">Phone:</span> {invoiceData.billedBy.phone}</p>
-                            </div>
-                        </div>
-                        <div className="text-right">
-                            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Billed To:</h4>
-                            <div className="space-y-1">
-                                <p className="font-bold text-slate-900">{invoiceData.billedTo.organization}</p>
-                                <p className="text-sm text-slate-500">{invoiceData.billedTo.contactPerson}</p>
-                                <p className="text-sm"><span className="text-slate-400">Email:</span> {invoiceData.billedTo.email}</p>
-                            </div>
-                        </div>
-                    </div>
+						<div className="grid gap-6 sm:grid-cols-2">
+							<div className="space-y-2">
+								<p className="text-xs font-semibold uppercase text-muted-foreground">
+									Billed By:
+								</p>
+								<p className="text-sm font-semibold text-foreground">
+									{INVOICE.billedBy.name}
+								</p>
+								<p className="text-xs text-muted-foreground">
+									Email: {INVOICE.billedBy.email}
+								</p>
+								<p className="text-xs text-muted-foreground">
+									Phone: {INVOICE.billedBy.phone}
+								</p>
+							</div>
+							<div className="space-y-2 text-right">
+								<p className="text-xs font-semibold uppercase text-muted-foreground">
+									Billed To:
+								</p>
+								<p className="text-sm font-semibold text-foreground">
+									{INVOICE.billedTo.name}
+								</p>
+								<p className="text-xs text-muted-foreground">
+									{INVOICE.billedTo.contact}
+								</p>
+								<p className="text-xs text-muted-foreground">
+									Email: {INVOICE.billedTo.email}
+								</p>
+							</div>
+						</div>
 
-                    {/* Date and Currency Section */}
-                    <div className="grid grid-cols-2 gap-12 mb-12">
-                        <div>
-                            <h4 className="text-sm font-bold text-slate-900 mb-1">Invoice Date:</h4>
-                            <p className="text-sm text-slate-500">{invoiceData.invoiceDate}</p>
-                        </div>
-                        <div className="text-right">
-                            <h4 className="text-sm font-bold text-slate-900 mb-1">Currency:</h4>
-                            <p className="text-sm text-slate-500 font-medium">{invoiceData.currency}</p>
-                        </div>
-                    </div>
+						<div className="mt-6 grid gap-4 sm:grid-cols-2">
+							<div>
+								<p className="text-xs font-semibold uppercase text-muted-foreground">
+									Invoice Date:
+								</p>
+								<p className="text-sm font-medium text-foreground">
+									{INVOICE.invoiceDate}
+								</p>
+							</div>
+							<div className="text-right">
+								<p className="text-xs font-semibold uppercase text-muted-foreground">
+									Currency:
+								</p>
+								<p className="text-sm font-medium text-foreground">
+									{INVOICE.currency}
+								</p>
+							</div>
+						</div>
 
-                    {/* Invoice Items Table */}
-                    <div className="mb-12">
-                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Invoice Items:</h4>
-                        <div className="rounded-md border overflow-hidden">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow className="bg-slate-500 hover:bg-slate-500 border-none">
-                                        <TableHead className="w-[60px] text-white font-semibold text-xs uppercase py-3">#</TableHead>
-                                        <TableHead className="text-white font-semibold text-xs uppercase py-3 text-left">Description</TableHead>
-                                        <TableHead className="w-[150px] text-white font-semibold text-xs uppercase py-3 text-right pr-6">Amount</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {invoiceData.items.map((item, index) => (
-                                        <TableRow key={item.id} className="bg-slate-50/50">
-                                            <TableCell className="text-sm font-medium text-slate-700 py-4">{index + 1}</TableCell>
-                                            <TableCell className="text-sm font-medium text-slate-900 py-4">{item.description}</TableCell>
-                                            <TableCell className="text-sm font-bold text-slate-900 py-4 text-right pr-6">
-                                                د.إ{item.amount.toLocaleString()}
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </div>
-                    </div>
+						<div className="mt-6">
+							<p className="text-xs font-semibold uppercase text-muted-foreground">
+								Invoice Items:
+							</p>
+							<div className="mt-3 overflow-hidden rounded-md border">
+								<Table>
+									<TableHeader>
+										<TableRow className="bg-muted/60">
+											<TableHead className="w-[60px] text-xs font-semibold uppercase text-muted-foreground">
+												#
+											</TableHead>
+											<TableHead className="text-xs font-semibold uppercase text-muted-foreground">
+												Description
+											</TableHead>
+											<TableHead className="text-right text-xs font-semibold uppercase text-muted-foreground">
+												Amount
+											</TableHead>
+										</TableRow>
+									</TableHeader>
+									<TableBody>
+										{INVOICE_ITEMS.map((item) => (
+											<TableRow key={item.id}>
+												<TableCell className="text-sm font-medium">
+													{item.id}
+												</TableCell>
+												<TableCell className="text-sm">
+													{item.description}
+												</TableCell>
+												<TableCell className="text-right text-sm font-medium">
+													{item.amount}
+												</TableCell>
+											</TableRow>
+										))}
+									</TableBody>
+								</Table>
+							</div>
+						</div>
 
-                    {/* Footer Section: Notes and Total */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-8 border-t border-slate-100">
-                        <div>
-                            <h4 className="text-sm font-bold text-slate-900 mb-3 uppercase tracking-wider">Notes:</h4>
-                            <p className="text-[13px] text-slate-500 leading-relaxed mb-6 italic">
-                                {invoiceData.notes}
-                            </p>
-                            
-                            <h4 className="text-sm font-bold text-slate-900 mb-3 uppercase tracking-wider">Payment Method:</h4>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-xs">
-                                <p><span className="text-slate-400">Bank:</span> {invoiceData.paymentMethod.bank}</p>
-                                <p><span className="text-slate-400">IBAN #:</span> {invoiceData.paymentMethod.iban}</p>
-                                <p><span className="text-slate-400">Account Title:</span> {invoiceData.paymentMethod.accountTitle}</p>
-                                <p><span className="text-slate-400">SWIFT Code:</span> {invoiceData.paymentMethod.swiftCode}</p>
-                                <p className="col-span-full"><span className="text-slate-400">Bank Address:</span> {invoiceData.paymentMethod.bankAddress}</p>
-                                <p><span className="text-slate-400">Bank Phone:</span> {invoiceData.paymentMethod.bankPhone}</p>
-                            </div>
-                        </div>
-                        <div className="flex flex-col items-end justify-start pt-4">
-                            <div className="flex items-center gap-12 border-b-2 border-slate-900 pb-2 mb-2">
-                                <h4 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Total Invoice Amount:</h4>
-                                <span className="text-xl font-black text-slate-900">
-                                    د.إ{invoiceData.items.reduce((sum, item) => sum + item.amount, 0).toLocaleString()}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-        </main>
-    );
+						<div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+							<div className="space-y-3">
+								<p className="text-xs font-semibold uppercase text-muted-foreground">
+									Notes:
+								</p>
+								<p className="text-xs text-muted-foreground">
+									Please make payments within 30 days of the invoice date.
+									Bank transfer details are provided below. Thank you for
+									your business!
+								</p>
+								<div className="space-y-1">
+									<p className="text-xs font-semibold uppercase text-muted-foreground">
+										Payment Method:
+									</p>
+									{PAYMENT_METHOD.map((item) => (
+										<div
+											key={item.label}
+											className="flex items-center justify-between text-xs text-muted-foreground"
+										>
+											<span>{item.label}</span>
+											<span>{item.value}</span>
+										</div>
+									))}
+								</div>
+							</div>
+							<div className="flex items-end justify-end">
+								<div className="rounded-md border bg-muted/30 px-4 py-3 text-right">
+									<p className="text-xs font-semibold uppercase text-muted-foreground">
+										Total Invoice Amount:
+									</p>
+									<p className="text-lg font-semibold text-foreground">
+										د.إ1200
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div className="space-y-4">
+						<div className="rounded-lg border bg-card p-4">
+							<div className="flex items-center gap-2 text-sm font-semibold text-primary">
+								<Receipt className="h-4 w-4" />
+								<span>Invoice Status</span>
+							</div>
+							<p className="mt-2 text-xs text-muted-foreground">
+								This invoice is awaiting payment. No payment receipt has been
+								submitted yet.
+							</p>
+							<div className="mt-4 rounded-md border bg-muted/20 p-3">
+								<p className="text-xs font-semibold text-muted-foreground">
+									Payment Status:
+								</p>
+								<p className="text-sm font-semibold text-foreground">
+									{INVOICE.paymentDescription}
+								</p>
+							</div>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+		</main>
+	);
 };
 
 export default GeneralInvoiceDetails;

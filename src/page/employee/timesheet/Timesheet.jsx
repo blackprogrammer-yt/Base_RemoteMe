@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { Fragment, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     Clock,
     Search,
@@ -11,6 +12,7 @@ import {
     ChevronRight,
     ChevronsLeft,
     ChevronsRight,
+    X,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -36,19 +38,18 @@ import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
-    DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Card, CardContent } from "@/components/ui/card";
 
 const Timesheet = () => {
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("all");
-    const [pageSize, setPageSize] = useState("10");
+    const [pageSize, setPageSize] = useState(10);
     const [searchQuery, setSearchQuery] = useState("");
-    const [selectedOrg, setSelectedOrg] = useState("all");
     const [viewMode, setViewMode] = useState("table");
-    const [density, setDensity] = useState("standard");
-
+    const [density, setDensity] = useState("compact");
+    const [currentPage, setCurrentPage] = useState(1);
     const [visibleColumns, setVisibleColumns] = useState({
         status: true,
         placement: true,
@@ -58,6 +59,40 @@ const Timesheet = () => {
         endDate: true,
         action: true,
     });
+    const [columnOrder, setColumnOrder] = useState([
+        "status",
+        "placement",
+        "jobTitle",
+        "client",
+        "startDate",
+        "endDate",
+        "action",
+    ]);
+    const [draggedColumn, setDraggedColumn] = useState(null);
+
+    const statusTabs = [
+        { key: "all", label: "All" },
+        { key: "draft", label: "Draft" },
+        { key: "missing", label: "Missing" },
+        { key: "submitted", label: "Submitted" },
+        { key: "approved", label: "Approved" },
+        { key: "declined", label: "Declined" },
+    ];
+
+    const columnDefinitions = [
+        { key: "status", label: "Status" },
+        { key: "placement", label: "Placement" },
+        { key: "jobTitle", label: "Job Title" },
+        { key: "client", label: "Client" },
+        { key: "startDate", label: "Start Date" },
+        { key: "endDate", label: "End Date" },
+        { key: "action", label: "Action" },
+    ];
+
+    const columnLabelMap = columnDefinitions.reduce((acc, column) => {
+        acc[column.key] = column.label;
+        return acc;
+    }, {});
 
     const initialTimesheetData = [
         {
@@ -109,387 +144,554 @@ const Timesheet = () => {
 
     // Filter logic
     const filteredData = initialTimesheetData.filter((item) => {
+        const normalizedQuery = searchQuery.trim().toLowerCase();
         const matchesStatus = activeTab === "all" || item.status.toLowerCase() === activeTab.toLowerCase();
-        const matchesOrg = selectedOrg === "all" || item.client === selectedOrg;
-        const matchesSearch = 
-            item.placement.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.jobTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.client.toLowerCase().includes(searchQuery.toLowerCase());
         
-        return matchesStatus && matchesOrg && matchesSearch;
+        if (!normalizedQuery) {
+            return matchesStatus;
+        }
+
+        const matchesSearch = [
+            item.placement,
+            item.jobTitle,
+            item.client,
+            item.startDate,
+            item.endDate,
+        ]
+            .join(" ")
+            .toLowerCase()
+            .includes(normalizedQuery);
+
+        return matchesStatus && matchesSearch;
     });
 
-    const organizations = [...new Set(initialTimesheetData.map(item => item.client))];
+    const totalCount = filteredData.length;
+    const pageCount = totalCount === 0 ? 1 : Math.ceil(totalCount / pageSize);
+    const safeCurrentPage = totalCount === 0 ? 1 : Math.min(currentPage, pageCount);
+    const startIndex = totalCount === 0 ? 0 : (safeCurrentPage - 1) * pageSize;
+    const endIndex = totalCount === 0 ? 0 : Math.min(startIndex + pageSize, totalCount);
+    const paginatedData = totalCount === 0 ? [] : filteredData.slice(startIndex, endIndex);
 
-    const densityClasses = {
-        compact: "py-2 px-6",
-        standard: "py-5 px-6",
-        comfortable: "py-8 px-6",
+    const handlePageChange = (newPage) => {
+        if (totalCount === 0) {
+            return;
+        }
+
+        const clampedPage = Math.max(1, Math.min(newPage, pageCount));
+        setCurrentPage(clampedPage);
     };
 
-    const rowPaddingClass = densityClasses[density] || densityClasses.standard;
+    const handlePageSizeChange = (newSize) => {
+        setPageSize(newSize);
+        setCurrentPage(1);
+    };
+
+    const handleDragStart = (key) => {
+        setDraggedColumn(key);
+    };
+
+    const handleDrop = (targetKey) => {
+        if (!draggedColumn || draggedColumn === targetKey) {
+            return;
+        }
+
+        const nextOrder = [...columnOrder];
+        const fromIndex = nextOrder.indexOf(draggedColumn);
+        const toIndex = nextOrder.indexOf(targetKey);
+
+        if (fromIndex === -1 || toIndex === -1) {
+            return;
+        }
+
+        nextOrder.splice(fromIndex, 1);
+        nextOrder.splice(toIndex, 0, draggedColumn);
+        setColumnOrder(nextOrder);
+        setDraggedColumn(null);
+    };
+
+    const visibleColumnOrder = columnOrder.filter((key) => visibleColumns[key]);
+
+    const densityClasses = {
+        compact: "py-2",
+        standard: "py-3",
+        comfortable: "py-4",
+    };
+
+    const rowPaddingClass = densityClasses[density] || densityClasses.compact;
 
     const getStatusBadge = (status) => {
-        if (status === "DRAFT") {
+        if (!status) {
+            return null;
+        }
+
+        const normalized = status.toLowerCase();
+        if (normalized === "draft") {
             return (
-                <Badge className="bg-slate-100 text-slate-600 hover:bg-slate-100 border-none px-3 py-1 text-[10px] font-bold">
-                    DRAFT
+                <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-slate-400/10 px-2 py-1 text-xs font-semibold uppercase text-slate-700">
+                    <span>Draft</span>
                 </Badge>
             );
         }
-        if (status === "MISSING") {
+
+        if (normalized === "missing") {
             return (
-                <Badge className="bg-orange-100 text-orange-600 hover:bg-orange-100 border-none px-3 py-1 text-[10px] font-bold">
-                    MISSING
+                <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-amber-500/10 px-2 py-1 text-xs font-semibold uppercase text-amber-700">
+                    <span>Missing</span>
                 </Badge>
             );
         }
-        if (status === "SUBMITTED") {
+
+        if (normalized === "submitted") {
             return (
-                <Badge className="bg-blue-100 text-blue-600 hover:bg-blue-100 border-none px-3 py-1 text-[10px] font-bold">
-                    SUBMITTED
+                <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-sky-500/10 px-2 py-1 text-xs font-semibold uppercase text-sky-700">
+                    <span>Submitted</span>
                 </Badge>
             );
         }
-        if (status === "APPROVED") {
+
+        if (normalized === "approved") {
             return (
-                <Badge className="bg-emerald-100 text-emerald-600 hover:bg-emerald-100 border-none px-3 py-1 text-[10px] font-bold">
-                    APPROVED
+                <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-emerald-500/10 px-2 py-1 text-xs font-semibold uppercase text-emerald-700">
+                    <span>Approved</span>
                 </Badge>
             );
         }
-        if (status === "DECLINED") {
+
+        if (normalized === "declined") {
             return (
-                <Badge className="bg-rose-100 text-rose-600 hover:bg-rose-100 border-none px-3 py-1 text-[10px] font-bold">
-                    DECLINED
+                <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-rose-500/10 px-2 py-1 text-xs font-semibold uppercase text-rose-700">
+                    <span>Declined</span>
                 </Badge>
             );
         }
+
         return (
-            <Badge variant="outline" className="text-slate-400 border-slate-200 px-3 py-1 text-[10px] font-bold">
-                {status}
+            <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-slate-400/10 px-2 py-1 text-xs font-semibold uppercase text-slate-700">
+                <span>{status}</span>
             </Badge>
         );
     };
 
+    const renderCell = (row, key) => {
+        if (key === "status") {
+            return (
+                <TableCell className={`px-4 ${rowPaddingClass}`}>
+                    {getStatusBadge(row.status)}
+                </TableCell>
+            );
+        }
+
+        if (key === "placement") {
+            return (
+                <TableCell className={`px-4 text-sm font-medium ${rowPaddingClass}`}>
+                    {row.placement}
+                </TableCell>
+            );
+        }
+
+        if (key === "jobTitle") {
+            return (
+                <TableCell className={`px-4 text-sm ${rowPaddingClass}`}>
+                    {row.jobTitle}
+                </TableCell>
+            );
+        }
+
+        if (key === "client") {
+            return (
+                <TableCell className={`px-4 text-sm ${rowPaddingClass}`}>
+                    {row.client}
+                </TableCell>
+            );
+        }
+
+        if (key === "startDate") {
+            return (
+                <TableCell className={`px-4 text-sm ${rowPaddingClass}`}>
+                    {row.startDate}
+                </TableCell>
+            );
+        }
+
+        if (key === "endDate") {
+            return (
+                <TableCell className={`px-4 text-sm ${rowPaddingClass}`}>
+                    {row.endDate}
+                </TableCell>
+            );
+        }
+
+        if (key === "action") {
+            return (
+                <TableCell className={`px-4 text-sm ${rowPaddingClass}`}>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-7 gap-2 px-2.5 text-xs text-primary"
+                        onClick={() =>
+                            navigate(`/employee/timesheets/${row.id}`, {
+                                state: { timesheet: row },
+                            })
+                        }
+                    >
+                        <Eye className="h-3.5 w-3.5" />
+                        View
+                    </Button>
+                </TableCell>
+            );
+        }
+
+        return null;
+    };
+
     return (
-        <div className="p-4 sm:p-6 space-y-6 bg-slate-50/50 min-h-screen">
-            {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex items-center gap-2">
-                    <div className="p-1.5 bg-blue-50 rounded-md">
-                        <Clock className="w-5 h-5 text-blue-500" />
+        <main className="flex flex-1 flex-col gap-4 py-4 md:pt-3">
+            <div className="flex flex-auto flex-col py-2">
+                <div className="flex min-w-0 flex-auto flex-col gap-2 sm:flex-row sm:items-center">
+                    <div className="flex flex-auto items-center gap-2">
+                        <Clock className="h-5 w-5 text-muted-foreground" />
+                        <h2 className="text-2xl font-bold tracking-tight">Timesheets</h2>
                     </div>
-                    <h1 className="text-xl font-semibold text-slate-800">Timesheets</h1>
                 </div>
             </div>
 
-            {/* Main Container Card */}
-            <div className="bg-white rounded-xl border shadow-sm overflow-hidden flex flex-col">
-                {/* Header: Filter Toolbar */}
-                <div className="p-4 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div className="flex flex-1 items-center gap-3 w-full md:w-auto">
-                        <Select value={selectedOrg} onValueChange={setSelectedOrg}>
-                            <SelectTrigger className="w-full md:w-[240px] h-10 border-slate-200">
-                                <SelectValue placeholder="-- All Client --" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">-- All Client --</SelectItem>
-                                {organizations.map((org) => (
-                                    <SelectItem key={org} value={org}>{org}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+            <div className="w-full rounded-lg border bg-card px-2 py-2 md:px-3">
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <div className="flex flex-wrap items-center gap-2">
+                        {statusTabs.map((tab) => (
+                            <Button
+                                key={tab.key}
+                                type="button"
+                                variant={
+                                    activeTab === tab.key ? "default" : "outline"
+                                }
+                                size="sm"
+                                className="h-9 border-dashed px-3 text-xs font-medium"
+                                onClick={() => setActiveTab(tab.key)}
+                            >
+                                {tab.label}
+                            </Button>
+                        ))}
                     </div>
 
-                    <div className="flex items-center gap-2 w-full md:w-auto justify-end">
-                        <div className="relative flex-1 md:w-[300px]">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                            <Input 
-                                placeholder="Search" 
-                                className="pl-9 h-10 border-slate-200 w-full"
+                    <div className="flex w-full flex-wrap items-center justify-start gap-2 md:w-auto md:justify-end">
+                        <div className="relative w-full md:w-[260px]">
+                            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                            <Input
+                                placeholder="Search"
                                 value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onChange={(event) =>
+                                    setSearchQuery(event.target.value)
+                                }
+                                className="h-9 w-full pl-9 pr-8"
                             />
+                            {searchQuery ? (
+                                <button
+                                    type="button"
+                                    onClick={() => setSearchQuery("")}
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-sm p-1 text-muted-foreground hover:bg-muted"
+                                    aria-label="Clear search"
+                                >
+                                    <X className="h-3.5 w-3.5" />
+                                </button>
+                            ) : null}
                         </div>
+
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="icon" className="h-10 w-10 border-slate-200">
-                                    <Filter className="w-4 h-4 text-slate-600" />
+                                <Button variant="outline" size="icon" aria-label="Filter">
+                                    <Filter />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-40">
-                                <DropdownMenuCheckboxItem
-                                    checked={activeTab === "all"}
-                                    onCheckedChange={() => setActiveTab("all")}
-                                >
-                                    All
-                                </DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem
-                                    checked={activeTab === "draft"}
-                                    onCheckedChange={() => setActiveTab("draft")}
-                                >
-                                    Draft
-                                </DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem
-                                    checked={activeTab === "missing"}
-                                    onCheckedChange={() => setActiveTab("missing")}
-                                >
-                                    Missing
-                                </DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem
-                                    checked={activeTab === "submitted"}
-                                    onCheckedChange={() => setActiveTab("submitted")}
-                                >
-                                    Submitted
-                                </DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem
-                                    checked={activeTab === "approved"}
-                                    onCheckedChange={() => setActiveTab("approved")}
-                                >
-                                    Approved
-                                </DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem
-                                    checked={activeTab === "declined"}
-                                    onCheckedChange={() => setActiveTab("declined")}
-                                >
-                                    Declined
-                                </DropdownMenuCheckboxItem>
+                            <DropdownMenuContent align="end">
+                                {statusTabs.map((tab) => (
+                                    <DropdownMenuCheckboxItem
+                                        key={tab.key}
+                                        className="capitalize"
+                                        checked={activeTab === tab.key}
+                                        onCheckedChange={() => setActiveTab(tab.key)}
+                                    >
+                                        {tab.label}
+                                    </DropdownMenuCheckboxItem>
+                                ))}
                             </DropdownMenuContent>
                         </DropdownMenu>
+
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="icon" className="h-10 w-10 border-slate-200">
-                                    <SlidersHorizontal className="w-4 h-4 text-slate-600" />
+                                <Button variant="outline" size="icon" aria-label="Density">
+                                    <SlidersHorizontal />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-40">
-                                <DropdownMenuItem onClick={() => setDensity("compact")} className="flex items-center gap-2">
-                                    {density === "compact" && <span>✓</span>}
-                                    <span>Compact</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setDensity("standard")} className="flex items-center gap-2">
-                                    {density === "standard" && <span>✓</span>}
-                                    <span>Standard</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setDensity("comfortable")} className="flex items-center gap-2">
-                                    {density === "comfortable" && <span>✓</span>}
-                                    <span>Comfortable</span>
-                                </DropdownMenuItem>
+                            <DropdownMenuContent align="end">
+                                {["compact", "standard", "comfortable"].map((option) => (
+                                    <DropdownMenuCheckboxItem
+                                        key={option}
+                                        className="capitalize"
+                                        checked={density === option}
+                                        onCheckedChange={() => setDensity(option)}
+                                    >
+                                        {option}
+                                    </DropdownMenuCheckboxItem>
+                                ))}
                             </DropdownMenuContent>
                         </DropdownMenu>
+
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="icon" className="h-10 w-10 border-slate-200">
-                                    <Columns3 className="w-4 h-4 text-slate-600" />
+                                <Button variant="outline" size="icon" aria-label="View">
+                                    <LayoutGrid />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-48">
-                                <DropdownMenuCheckboxItem
-                                    checked={visibleColumns.status}
-                                    onCheckedChange={(checked) => setVisibleColumns(prev => ({ ...prev, status: checked }))}
-                                >
-                                    Status
-                                </DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem
-                                    checked={visibleColumns.placement}
-                                    onCheckedChange={(checked) => setVisibleColumns(prev => ({ ...prev, placement: checked }))}
-                                >
-                                    Placement
-                                </DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem
-                                    checked={visibleColumns.jobTitle}
-                                    onCheckedChange={(checked) => setVisibleColumns(prev => ({ ...prev, jobTitle: checked }))}
-                                >
-                                    Job Title
-                                </DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem
-                                    checked={visibleColumns.client}
-                                    onCheckedChange={(checked) => setVisibleColumns(prev => ({ ...prev, client: checked }))}
-                                >
-                                    Client
-                                </DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem
-                                    checked={visibleColumns.startDate}
-                                    onCheckedChange={(checked) => setVisibleColumns(prev => ({ ...prev, startDate: checked }))}
-                                >
-                                    Start Date
-                                </DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem
-                                    checked={visibleColumns.endDate}
-                                    onCheckedChange={(checked) => setVisibleColumns(prev => ({ ...prev, endDate: checked }))}
-                                >
-                                    End Date
-                                </DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem
-                                    checked={visibleColumns.action}
-                                    onCheckedChange={(checked) => setVisibleColumns(prev => ({ ...prev, action: checked }))}
-                                >
-                                    Action
-                                </DropdownMenuCheckboxItem>
+                            <DropdownMenuContent align="end">
+                                {["table", "cards"].map((option) => (
+                                    <DropdownMenuCheckboxItem
+                                        key={option}
+                                        className="capitalize"
+                                        checked={viewMode === option}
+                                        onCheckedChange={() => setViewMode(option)}
+                                    >
+                                        {option}
+                                    </DropdownMenuCheckboxItem>
+                                ))}
                             </DropdownMenuContent>
                         </DropdownMenu>
+
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="icon" className="h-10 w-10 border-slate-200">
-                                    <LayoutGrid className="w-4 h-4 text-slate-600" />
+                                <Button variant="outline" size="icon" aria-label="Columns">
+                                    <Columns3 />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-32">
-                                <DropdownMenuItem onClick={() => setViewMode("table")} className="flex items-center gap-2">
-                                    {viewMode === "table" && <span>✓</span>}
-                                    <span>Table</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setViewMode("cards")} className="flex items-center gap-2">
-                                    {viewMode === "cards" && <span>✓</span>}
-                                    <span>Cards</span>
-                                </DropdownMenuItem>
+                            <DropdownMenuContent align="end">
+                                {columnDefinitions.map((column) => (
+                                    <DropdownMenuCheckboxItem
+                                        key={column.key}
+                                        className="capitalize"
+                                        checked={visibleColumns[column.key]}
+                                        onCheckedChange={(value) =>
+                                            setVisibleColumns((prev) => ({
+                                                ...prev,
+                                                [column.key]: !!value,
+                                            }))
+                                        }
+                                    >
+                                        {column.label}
+                                    </DropdownMenuCheckboxItem>
+                                ))}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
                 </div>
 
-                {/* Body: Content Section in separate box */}
-                <div className="px-4 py-2 flex-1">
-                    <div className="rounded-lg border bg-white overflow-hidden">
-                        {viewMode === "table" ? (
-                            <div className="overflow-x-auto">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                                            {visibleColumns.status && <TableHead className="font-semibold text-slate-700 uppercase text-[11px] tracking-wider py-4 px-6">Status</TableHead>}
-                                            {visibleColumns.placement && <TableHead className="font-semibold text-slate-700 uppercase text-[11px] tracking-wider py-4 px-6">Placement</TableHead>}
-                                            {visibleColumns.jobTitle && <TableHead className="font-semibold text-slate-700 uppercase text-[11px] tracking-wider py-4 px-6">Job Title</TableHead>}
-                                            {visibleColumns.client && <TableHead className="font-semibold text-slate-700 uppercase text-[11px] tracking-wider py-4 px-6">Client</TableHead>}
-                                            {visibleColumns.startDate && <TableHead className="font-semibold text-slate-700 uppercase text-[11px] tracking-wider py-4 px-6">Start Date</TableHead>}
-                                            {visibleColumns.endDate && <TableHead className="font-semibold text-slate-700 uppercase text-[11px] tracking-wider py-4 px-6">End Date</TableHead>}
-                                            {visibleColumns.action && <TableHead className="font-semibold text-slate-700 uppercase text-[11px] tracking-wider py-4 px-6">Action</TableHead>}
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {filteredData.length > 0 ? (
-                                            filteredData.map((row) => (
-                                                <TableRow key={row.id} className="hover:bg-slate-50 border-b border-slate-100 last:border-0">
-                                                    {visibleColumns.status && <TableCell className={rowPaddingClass}>{getStatusBadge(row.status)}</TableCell>}
-                                                    {visibleColumns.placement && <TableCell className={`${rowPaddingClass} font-semibold text-slate-700`}>{row.placement}</TableCell>}
-                                                    {visibleColumns.jobTitle && <TableCell className={`${rowPaddingClass} text-slate-600 font-medium`}>{row.jobTitle}</TableCell>}
-                                                    {visibleColumns.client && <TableCell className={`${rowPaddingClass} text-slate-600 font-medium`}>{row.client}</TableCell>}
-                                                    {visibleColumns.startDate && <TableCell className={`${rowPaddingClass} text-slate-500`}>{row.startDate}</TableCell>}
-                                                    {visibleColumns.endDate && <TableCell className={`${rowPaddingClass} text-slate-500`}>{row.endDate}</TableCell>}
-                                                    {visibleColumns.action && (
-                                                        <TableCell className={rowPaddingClass}>
-                                                            <Button variant="outline" className="text-slate-700 border-slate-200 hover:bg-slate-50 h-9 px-4 text-sm font-medium">
-                                                                Action
-                                                            </Button>
-                                                        </TableCell>
-                                                    )}
-                                                </TableRow>
-                                            ))
-                                        ) : (
-                                            <TableRow>
-                                                <TableCell colSpan={Object.values(visibleColumns).filter(Boolean).length} className="h-32 text-center text-slate-500 bg-slate-50/30">
-                                                    No timesheets found.
-                                                </TableCell>
+                <div className="mt-4">
+                    {viewMode === "table" ? (
+                        <div className="overflow-hidden rounded-lg border bg-card shadow-sm">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="border-b bg-muted/40">
+                                        {visibleColumnOrder.map((key) => (
+                                            <TableHead
+                                                key={key}
+                                                draggable
+                                                onDragStart={() => handleDragStart(key)}
+                                                onDragOver={(event) => event.preventDefault()}
+                                                onDrop={() => handleDrop(key)}
+                                                className="cursor-move select-none px-4 text-left text-xs font-semibold uppercase text-muted-foreground"
+                                            >
+                                                <span className="inline-flex items-center gap-2">
+                                                    <span className="text-muted-foreground/70">::</span>
+                                                    {columnLabelMap[key]}
+                                                </span>
+                                            </TableHead>
+                                        ))}
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {paginatedData.length > 0 ? (
+                                        paginatedData.map((row) => (
+                                            <TableRow
+                                                key={row.id}
+                                                className="hover:bg-muted/30"
+                                            >
+                                                {visibleColumnOrder.map((key) => (
+                                                    <Fragment key={key}>
+                                                        {renderCell(row, key)}
+                                                    </Fragment>
+                                                ))}
                                             </TableRow>
-                                        )}
-                                    </TableBody>
-                                </Table>
-                            </div>
-                        ) : (
-                            <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 bg-slate-50/30 min-h-[200px]">
-                                {filteredData.length > 0 ? (
-                                    filteredData.map((row) => (
-                                        <Card key={row.id} className="overflow-hidden border-slate-200 hover:shadow-md transition-shadow bg-white">
-                                            <CardContent className="p-5 space-y-4">
-                                                <div className="flex justify-between items-start">
-                                                    <div className="space-y-1">
-                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Client</p>
-                                                        <p className="font-bold text-slate-900 text-base">{row.client}</p>
-                                                    </div>
-                                                    {getStatusBadge(row.status)}
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell
+                                                colSpan={visibleColumnOrder.length}
+                                                className="px-4 py-6 text-center text-sm text-muted-foreground"
+                                            >
+                                                No timesheets found.
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    ) : (
+                        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                            {paginatedData.length > 0 ? (
+                                paginatedData.map((row) => (
+                                    <Card key={row.id} className="overflow-hidden border-slate-200">
+                                        <CardContent className="p-4 space-y-3">
+                                            <div className="flex items-start justify-between gap-3">
+                                                <div>
+                                                    {visibleColumns.placement && (
+                                                        <p className="text-sm font-semibold">
+                                                            {row.placement}
+                                                        </p>
+                                                    )}
+                                                    {visibleColumns.jobTitle && (
+                                                        <p className="mt-1 text-xs text-muted-foreground">
+                                                            {row.jobTitle}
+                                                        </p>
+                                                    )}
                                                 </div>
-                                                
-                                                <div className="grid grid-cols-2 gap-4">
-                                                    <div className="space-y-1">
-                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Placement</p>
-                                                        <p className="text-xs font-semibold text-slate-700">{row.placement}</p>
-                                                    </div>
-                                                    <div className="space-y-1">
-                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Job Title</p>
-                                                        <p className="text-xs font-semibold text-slate-700">{row.jobTitle}</p>
-                                                    </div>
-                                                </div>
+                                                {visibleColumns.status
+                                                    ? getStatusBadge(row.status)
+                                                    : null}
+                                            </div>
 
-                                                <div className="pt-4 border-t border-slate-100 flex justify-between items-center">
-                                                    <div className="space-y-1">
-                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Duration</p>
-                                                        <p className="text-[11px] text-slate-500 font-medium">{row.startDate} - {row.endDate}</p>
-                                                    </div>
-                                                    <Button variant="outline" size="sm" className="h-8 text-xs font-bold border-slate-200">
-                                                        Action
+                                            {visibleColumns.client && (
+                                                <div>
+                                                    <p className="text-xs text-muted-foreground">Client</p>
+                                                    <p className="text-sm font-medium">{row.client}</p>
+                                                </div>
+                                            )}
+
+                                            {(visibleColumns.startDate || visibleColumns.endDate) && (
+                                                <div className="grid gap-2 sm:grid-cols-2">
+                                                    {visibleColumns.startDate && (
+                                                        <div>
+                                                            <p className="text-xs text-muted-foreground">Start Date</p>
+                                                            <p className="text-sm font-medium">{row.startDate}</p>
+                                                        </div>
+                                                    )}
+                                                    {visibleColumns.endDate && (
+                                                        <div>
+                                                            <p className="text-xs text-muted-foreground">End Date</p>
+                                                            <p className="text-sm font-medium">{row.endDate}</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            {visibleColumns.action && (
+                                                <div className="mt-4">
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="w-full gap-2 px-3 text-xs"
+                                                        onClick={() =>
+                                                            navigate(`/employee/timesheets/${row.id}`, {
+                                                                state: { timesheet: row },
+                                                            })
+                                                        }
+                                                    >
+                                                        <Eye className="h-3.5 w-3.5" />
+                                                        View
                                                     </Button>
                                                 </div>
-                                            </CardContent>
-                                        </Card>
-                                    ))
-                                ) : (
-                                    <div className="col-span-full flex flex-col items-center justify-center py-20 text-slate-500">
-                                        <p className="text-lg font-medium">No timesheets found.</p>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+                                ))
+                            ) : (
+                                <div className="col-span-full flex items-center justify-center py-12">
+                                    <p className="text-center text-sm text-muted-foreground">
+                                        No timesheets found.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
 
-                {/* Footer: Pagination Section */}
-                <div className="p-4 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div className="flex-1 text-sm text-slate-500 font-medium">
-                        Showing 1-{filteredData.length} of {filteredData.length}
+                <div className="mt-4 flex flex-col justify-between gap-4 px-2 lg:flex-row lg:items-center">
+                    <div className="flex-1 text-sm text-muted-foreground">
+                        Showing {totalCount === 0 ? 0 : startIndex + 1}-
+                        {endIndex} of {totalCount}
                     </div>
 
-                    <div className="flex flex-col md:flex-row items-center gap-6">
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm text-slate-600 font-medium">Rows per page</span>
-                            <Select value={pageSize} onValueChange={setPageSize}>
-                                <SelectTrigger className="w-[70px] h-9 border-slate-200 bg-white">
-                                    <SelectValue placeholder="10" />
+                    <div className="flex flex-col space-y-2 text-sm lg:flex-row lg:items-center lg:space-x-8 lg:space-y-0">
+                        <div className="flex items-center space-x-2">
+                            <span className="font-medium">Rows per page</span>
+                            <Select
+                                value={`${pageSize}`}
+                                onValueChange={(value) =>
+                                    handlePageSizeChange(Number(value))
+                                }
+                            >
+                                <SelectTrigger className="h-8 w-[70px]">
+                                    <SelectValue placeholder={`${pageSize}`} />
                                 </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="10">10</SelectItem>
-                                    <SelectItem value="25">25</SelectItem>
-                                    <SelectItem value="50">50</SelectItem>
+                                <SelectContent side="top">
+                                    {[10, 20, 30, 40, 50].map((size) => (
+                                        <SelectItem key={size} value={`${size}`}>
+                                            {size}
+                                        </SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                         </div>
 
-                        <div className="text-sm text-slate-600 font-medium">
-                            Page 1 of 1
-                        </div>
+                        <div className="flex items-center">
+                            <div className="flex items-center justify-center font-medium lg:w-[100px]">
+                                Page {totalCount === 0 ? 0 : safeCurrentPage} of {pageCount}
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <Button
+                                    variant="outline"
+                                    className="hidden h-8 w-8 p-0 lg:flex"
+                                    onClick={() => handlePageChange(1)}
+                                    disabled={safeCurrentPage === 1 || totalCount === 0}
+                                >
+                                    <span className="sr-only">Go to first page</span>
+                                    <ChevronsLeft className="h-4 w-4" />
+                                </Button>
 
-                        <div className="flex items-center gap-2">
-                            <Button variant="outline" size="icon" className="h-9 w-9 border-slate-200" disabled>
-                                <ChevronsLeft className="w-4 h-4 text-slate-400" />
-                            </Button>
-                            
-                            <Button variant="outline" className="h-9 gap-1 px-3 border-slate-200 text-slate-400" disabled>
-                                <ChevronLeft className="w-4 h-4" />
-                                <span className="text-sm font-medium">Previous</span>
-                            </Button>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => handlePageChange(safeCurrentPage - 1)}
+                                    disabled={safeCurrentPage === 1 || totalCount === 0}
+                                >
+                                    <span className="sr-only">Go to previous page</span>
+                                    <ChevronLeft className="h-4 w-4" />
+                                    Previous
+                                </Button>
 
-                            <Button variant="outline" className="h-9 gap-1 px-3 border-slate-200 text-slate-600 hover:bg-slate-50">
-                                <span className="text-sm font-medium">Next</span>
-                                <ChevronRight className="w-4 h-4" />
-                            </Button>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => handlePageChange(safeCurrentPage + 1)}
+                                    disabled={safeCurrentPage >= pageCount || totalCount === 0}
+                                >
+                                    <span className="sr-only">Go to next page</span>
+                                    Next <ChevronRight className="h-4 w-4" />
+                                </Button>
 
-                            <Button variant="outline" size="icon" className="h-9 w-9 border-slate-200">
-                                <ChevronsRight className="w-4 h-4 text-slate-600" />
-                            </Button>
+                                <Button
+                                    variant="outline"
+                                    className="hidden h-8 w-8 p-0 lg:flex"
+                                    onClick={() => handlePageChange(pageCount)}
+                                    disabled={safeCurrentPage >= pageCount || totalCount === 0}
+                                >
+                                    <span className="sr-only">Go to last page</span>
+                                    <ChevronsRight className="h-4 w-4" />
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     );
 };
 

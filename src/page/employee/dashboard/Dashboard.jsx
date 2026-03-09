@@ -286,7 +286,7 @@ const Dashboard = () => {
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Profile Status Card */}
-                    <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div className="relative overflow-hidden bg-white p-6 rounded-xl border-0 shadow-sm flex items-center justify-between">
                         <div className="flex items-center gap-4">
                             <div className="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center overflow-hidden">
                                 <User className="w-10 h-10 text-white" fill="currentColor" />
@@ -308,7 +308,7 @@ const Dashboard = () => {
                     </div>
 
                     {/* Current Pay Card */}
-                    <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm space-y-4 relative">
+                    <div className="relative overflow-hidden bg-white p-6 rounded-xl border-0 shadow-sm space-y-4">
                         <div className="flex items-center gap-2">
                             <Banknote className="w-4 h-4 text-slate-600" />
                             <span className="text-slate-800 font-bold text-base">Current Pay</span>

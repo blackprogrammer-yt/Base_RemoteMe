@@ -52,6 +52,8 @@ import SignIn from "@/page/auth/Sign-in";
 import SignUp from "@/page/auth/Sign-up";
 import ForgotPassword from "@/page/auth/Forgot-password";
 import Otp from "@/page/auth/Otp";
+import UpdateProfile from "@/components/avatar/UpdateProfile";
+import ChangePassword from "@/components/avatar/ChangePassword";
 export const protectedRoutePaths = [
     { path: PROTECTED_ROUTES.ORGANIZATION_DASHBOARD, element: _jsx(OrganizationDashboard, {}) },
     { path: PROTECTED_ROUTES.ORGANIZATION_HIRE_AND_BOARD, element: _jsx(HireAndBoard, {}) },
@@ -181,6 +183,14 @@ export const protectedRoutePaths = [
     {
         path: PROTECTED_ROUTES.ADMIN_EDIT_DOCUMENT,
         element: _jsx(EditDocument, {}),
+    },
+    {
+        path: PROTECTED_ROUTES.AVATAR_UPDATE_PROFILE,
+        element: _jsx(UpdateProfile, {}),
+    },
+    {
+        path: PROTECTED_ROUTES.AVATAR_CHANGE_PASSWORD,
+        element: _jsx(ChangePassword, {}),
     },
 ];
 export const baseRoutePaths = [

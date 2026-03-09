@@ -6,6 +6,8 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import AvatarMenu from "@/components/avatar/AvatarMenu";
+import NotificationPanel from "@/components/notifications/NotificationPanel";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useLocation } from "react-router-dom";
 import { Separator } from "./ui/separator";
@@ -53,6 +55,11 @@ const Header = () => {
                         ) : null}
                     </BreadcrumbList>
                 </Breadcrumb>
+            </div>
+
+            <div className="flex items-center gap-2 pr-3">
+                <NotificationPanel />
+                <AvatarMenu />
             </div>
         </header>
     );

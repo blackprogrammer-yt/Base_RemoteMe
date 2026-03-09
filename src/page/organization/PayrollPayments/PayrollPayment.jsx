@@ -60,22 +60,22 @@ const PayrollPayment = () => {
     return (
         <main className="flex flex-1 flex-col py-4 md:pt-3">
             {/* Header */}
-            <section className="mb-6 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
-                        <Folder className="h-5 w-5 text-muted-foreground" />
+            <section className="mb-8 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                        <Folder className="h-5 w-5" />
                     </div>
                     <h2 className="text-2xl font-bold tracking-tight">
                         Payroll Payments
                     </h2>
                 </div>
-                <Button className="h-9 gap-2">
+                <Button className="h-9 gap-2 rounded-lg font-medium">
                     Generate Payment Cycle
                 </Button>
             </section>
 
             {/* Filter Section */}
-            <section className="mb-6">
+            <section className="mb-8">
                 <div className="flex items-center gap-3">
                     <Label className="text-base font-medium text-foreground">
                         Filter by Month:
@@ -106,7 +106,7 @@ const PayrollPayment = () => {
             </section>
 
             {/* Payment Cycles Grid */}
-            <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
+            <section className="grid gap-6 md:grid-cols-2">
                 {paymentCycles.map((cycle) => (
                     <Card
                         key={cycle.id}
@@ -118,47 +118,43 @@ const PayrollPayment = () => {
                                 )
                             )
                         }
-                        className={cn(
-                            "overflow-hidden border-l-[6px] shadow-sm cursor-pointer transition-colors hover:bg-muted/30",
-                            cycle.borderColor
-                        )}
+                        className="relative overflow-hidden rounded-xl border-0 bg-white shadow-sm cursor-pointer transition-all hover:shadow-md dark:bg-slate-900"
                     >
-                        <CardContent className="p-6">
-                            {/* Card Header */}
-                            <div
-                                className={cn(
-                                    "mb-4 flex items-center justify-between rounded-lg px-4 py-3 text-white",
-                                    cycle.bgColor
-                                )}
-                            >
-                                <div className="flex items-center gap-2">
-                                    <Folder className="h-5 w-5" />
-                                    <span className="text-lg font-semibold">
-                                        {cycle.month}
-                                    </span>
-                                </div>
-                                <span className="text-sm font-medium">
-                                    Status: {cycle.status}
+                        {/* Card Header */}
+                        <div
+                            className={cn(
+                                "flex items-center justify-between px-6 py-4 text-white",
+                                cycle.bgColor
+                            )}
+                        >
+                            <div className="flex items-center gap-2.5">
+                                <Folder className="h-5 w-5" />
+                                <span className="text-lg font-bold tracking-tight">
+                                    {cycle.month}
                                 </span>
                             </div>
+                            <span className="inline-flex items-center rounded-full bg-white/20 px-3 py-1 text-xs font-bold uppercase tracking-wide">
+                                Status: {cycle.status}
+                            </span>
+                        </div>
 
-                            {/* Cycle Details */}
-                            <div className="space-y-4">
+                        <CardContent className="p-6">
+                            <div className="flex flex-row flex-wrap gap-8">
                                 {/* Cycle Dates */}
-                                <div className="space-y-2">
-                                    <div className="flex items-center gap-2 text-sm">
+                                <div>
+                                    <div className="mb-2 flex items-center gap-2">
                                         <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-                                        <span className="font-medium text-muted-foreground">
+                                        <span className="text-sm font-semibold text-foreground">
                                             Cycle
                                         </span>
                                     </div>
-                                    <div className="ml-6 space-y-1 text-sm">
+                                    <div className="ml-6 space-y-1.5 text-sm">
                                         <div className="flex items-center gap-2">
                                             <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground" />
                                             <span className="text-muted-foreground">
                                                 Start Date:
                                             </span>
-                                            <span className="font-medium">
+                                            <span className="font-semibold">
                                                 {cycle.startDate}
                                             </span>
                                         </div>
@@ -167,7 +163,7 @@ const PayrollPayment = () => {
                                             <span className="text-muted-foreground">
                                                 End Date:
                                             </span>
-                                            <span className="font-medium">
+                                            <span className="font-semibold">
                                                 {cycle.endDate}
                                             </span>
                                         </div>
@@ -175,42 +171,47 @@ const PayrollPayment = () => {
                                 </div>
 
                                 {/* Contract Amount */}
-                                <div className="space-y-2">
-                                    <div className="flex items-center gap-2 text-sm">
+                                <div>
+                                    <div className="mb-2 flex items-center gap-2">
                                         <DollarSign className="h-4 w-4 text-muted-foreground" />
-                                        <span className="font-medium text-muted-foreground">
+                                        <span className="text-sm font-semibold text-foreground">
                                             Contract Amount
                                         </span>
                                     </div>
-                                    <div className="ml-6 space-y-1">
-                                        <div className="text-xl font-bold text-blue-600">
+                                    <div className="ml-6 space-y-0.5">
+                                        <div className="text-2xl font-bold tracking-tight text-blue-600">
                                             {cycle.contractAmount.primary}
                                         </div>
-                                        <div className="text-lg font-semibold text-blue-600">
+                                        <div className="text-base font-semibold text-blue-500">
                                             {cycle.contractAmount.secondary}
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Invoice Amount */}
-                                <div className="space-y-2">
-                                    <div className="flex items-center gap-2 text-sm">
+                                <div>
+                                    <div className="mb-2 flex items-center gap-2">
                                         <FileText className="h-4 w-4 text-muted-foreground" />
-                                        <span className="font-medium text-muted-foreground">
+                                        <span className="text-sm font-semibold text-foreground">
                                             Invoice Amount
                                         </span>
                                     </div>
-                                    <div className="ml-6 space-y-1">
-                                        <div className="text-xl font-bold text-emerald-600">
+                                    <div className="ml-6 space-y-0.5">
+                                        <div className="text-2xl font-bold tracking-tight text-emerald-600">
                                             {cycle.invoiceAmount.primary}
                                         </div>
-                                        <div className="text-lg font-semibold text-emerald-600">
+                                        <div className="text-base font-semibold text-emerald-500">
                                             {cycle.invoiceAmount.secondary}
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </CardContent>
+
+                        {/* Background Icon */}
+                        <div className="absolute bottom-0 right-0 -m-6 h-24 w-24 opacity-10">
+                            <DollarSign className="h-24 w-24 text-muted-foreground" />
+                        </div>
                     </Card>
                 ))}
             </section>

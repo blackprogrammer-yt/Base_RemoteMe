@@ -677,7 +677,7 @@ const Dashboard = () => {
                 </div>
 
                 <div className="space-y-4">
-                    <Card className="border-0 bg-muted/40 shadow-none">
+                    <Card className="relative overflow-hidden rounded-xl border-0 bg-white shadow-sm dark:bg-slate-900">
                         <CardContent className="flex items-center justify-between p-4">
                             <div className="flex items-center gap-3">
                                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -692,7 +692,7 @@ const Dashboard = () => {
                         </CardContent>
                     </Card>
 
-                    <Card className="border-0 bg-muted/40 shadow-none">
+                    <Card className="relative overflow-hidden rounded-xl border-0 bg-white shadow-sm dark:bg-slate-900">
                         <CardContent className="flex items-center justify-between p-4">
                             <div className="flex items-center gap-3">
                                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -707,7 +707,7 @@ const Dashboard = () => {
                         </CardContent>
                     </Card>
 
-                    <Card className="border-0 bg-muted/40 shadow-none">
+                    <Card className="relative overflow-hidden rounded-xl border-0 bg-white shadow-sm dark:bg-slate-900">
                         <CardContent className="flex items-center justify-between p-4">
                             <div className="flex items-center gap-3">
                                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">

@@ -71,7 +71,7 @@ const PayrollInvoices = () => {
     const [selectedOrganization, setSelectedOrganization] = useState(undefined);
     const [activeStatus, setActiveStatus] = useState("all");
     const [viewMode, setViewMode] = useState("table");
-    const [density, setDensity] = useState("standard");
+    const [density, setDensity] = useState("compact");
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [visibleColumns, setVisibleColumns] = useState({
@@ -112,9 +112,11 @@ const PayrollInvoices = () => {
     };
 
     const totalCount = filteredInvoices.length;
-    const pageCount = Math.ceil(totalCount / pageSize);
-    const startIndex = (currentPage - 1) * pageSize;
-    const paginatedInvoices = filteredInvoices.slice(startIndex, startIndex + pageSize);
+    const pageCount = totalCount === 0 ? 1 : Math.ceil(totalCount / pageSize);
+    const safeCurrentPage = totalCount === 0 ? 1 : Math.min(currentPage, pageCount);
+    const startIndex = totalCount === 0 ? 0 : (safeCurrentPage - 1) * pageSize;
+    const endIndex = totalCount === 0 ? 0 : Math.min(startIndex + pageSize, totalCount);
+    const paginatedInvoices = totalCount === 0 ? [] : filteredInvoices.slice(startIndex, endIndex);
 
     const densityClasses = {
         compact: "py-1.5",
@@ -123,6 +125,20 @@ const PayrollInvoices = () => {
     };
 
     const rowPaddingClass = densityClasses[density] || densityClasses.standard;
+
+    const handlePageChange = (newPage) => {
+        if (totalCount === 0) {
+            return;
+        }
+
+        const clampedPage = Math.max(1, Math.min(newPage, pageCount));
+        setCurrentPage(clampedPage);
+    };
+
+    const handlePageSizeChange = (newSize) => {
+        setPageSize(newSize);
+        setCurrentPage(1);
+    };
 
     const handleVoid = (id) => {
         setInvoicesData(prev => prev.map(inv => 
@@ -148,7 +164,7 @@ const PayrollInvoices = () => {
             case "paid":
                 return (
                     <div className="flex items-center justify-center gap-2">
-                        <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-[#167d4c] px-2 py-1 text-[10px] font-bold uppercase text-white shadow-sm">
+                        <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-emerald-500/10 px-2 py-1 text-xs font-semibold uppercase text-emerald-700">
                             Paid
                         </Badge>
                         <a 
@@ -163,13 +179,13 @@ const PayrollInvoices = () => {
                 );
             case "pending":
                 return (
-                    <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-amber-500/10 px-2 py-1 text-[10px] font-bold uppercase text-amber-700">
+                    <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-amber-500/10 px-2 py-1 text-xs font-semibold uppercase text-amber-700">
                         Pending
                     </Badge>
                 );
             case "voided":
                 return (
-                    <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-rose-600 px-2 py-1 text-[10px] font-bold uppercase text-white shadow-sm">
+                    <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-rose-600 px-2 py-1 text-xs font-semibold uppercase text-white shadow-sm">
                         Voided
                     </Badge>
                 );
@@ -181,21 +197,21 @@ const PayrollInvoices = () => {
     return (
         <main className="flex flex-1 flex-col gap-4 py-4 md:pt-3">
             <div className="flex flex-auto flex-col py-2">
-                <div className="flex min-w-0 flex-auto flex-col gap-2 sm:flex-row sm:items-center justify-between">
+                <div className="flex min-w-0 flex-auto flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-2">
-                        <FileText className="h-6 w-6 text-primary" />
-                        <h2 className="text-2xl font-bold tracking-tight text-slate-800">
+                        <FileText className="h-5 w-5 text-muted-foreground" />
+                        <h2 className="text-2xl font-bold tracking-tight">
                             Payroll Invoices
                         </h2>
                     </div>
                 </div>
             </div>
 
-            <div className="rounded-xl border bg-card shadow-sm">
-                <div className="p-4 flex flex-col gap-4 md:flex-row md:items-center justify-between">
-                    <div className="flex flex-wrap items-center gap-3">
+            <div className="w-full rounded-lg border bg-card px-2 py-2 md:px-3">
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <div className="flex flex-wrap items-center gap-2">
                         <Select value={selectedOrganization} onValueChange={setSelectedOrganization}>
-                            <SelectTrigger className="w-full md:w-56 h-9 bg-slate-50/50">
+                            <SelectTrigger className="h-9 w-full md:w-[260px]">
                                 <SelectValue placeholder="Select Organization" />
                             </SelectTrigger>
                             <SelectContent>
@@ -209,43 +225,63 @@ const PayrollInvoices = () => {
                         </Select>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-3">
-                        <div className="relative w-full md:w-56">
-                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <div className="flex w-full flex-wrap items-center justify-start gap-2 md:w-auto md:justify-end">
+                        <div className="relative w-full md:w-[260px]">
+                            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                             <Input
-                                placeholder="Search invoices..."
-                                className="pl-9 h-9 bg-slate-50/50"
+                                placeholder="Search"
+                                className="h-9 w-full pl-9 pr-8"
                                 value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onChange={(e) => {
+                                    setSearchQuery(e.target.value);
+                                    setCurrentPage(1);
+                                }}
                             />
+                            {searchQuery ? (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setSearchQuery("");
+                                        setCurrentPage(1);
+                                    }}
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-sm p-1 text-muted-foreground hover:bg-muted"
+                                    aria-label="Clear search"
+                                >
+                                    <X className="h-3.5 w-3.5" />
+                                </button>
+                            ) : null}
                         </div>
-                        <div className="flex items-center gap-1 border rounded-md p-1 bg-slate-50/50">
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-slate-900 focus-visible:ring-0 focus-visible:ring-offset-0">
-                                        <Filter className="h-4 w-4" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-40 bg-white">
+
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="icon" aria-label="Filter">
+                                    <Filter className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-40 bg-white">
                                     {statusFilterOptions.map((option) => (
                                         <DropdownMenuCheckboxItem
                                             key={option.key}
                                             checked={activeStatus === option.key}
-                                            onCheckedChange={() => setActiveStatus(option.key)}
+                                            onCheckedChange={() => {
+                                                setActiveStatus(option.key);
+                                                setCurrentPage(1);
+                                            }}
                                             className="text-sm cursor-pointer"
                                         >
                                             {option.label}
                                         </DropdownMenuCheckboxItem>
                                     ))}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-slate-900 focus-visible:ring-0 focus-visible:ring-offset-0">
-                                        <SlidersHorizontal className="h-4 w-4" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-32 bg-white">
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="icon" aria-label="Density">
+                                    <SlidersHorizontal className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-32 bg-white">
                                     <DropdownMenuCheckboxItem
                                         checked={density === "compact"}
                                         onCheckedChange={() => setDensity("compact")}
@@ -267,15 +303,16 @@ const PayrollInvoices = () => {
                                     >
                                         Comfortable
                                     </DropdownMenuCheckboxItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-slate-900 focus-visible:ring-0 focus-visible:ring-offset-0">
-                                        <Columns3 className="h-4 w-4" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-32 bg-white">
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="icon" aria-label="View">
+                                    <Columns3 className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-32 bg-white">
                                     <DropdownMenuCheckboxItem
                                         checked={viewMode === "table"}
                                         onCheckedChange={() => setViewMode("table")}
@@ -290,15 +327,16 @@ const PayrollInvoices = () => {
                                     >
                                         Cards
                                     </DropdownMenuCheckboxItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-slate-900 focus-visible:ring-0 focus-visible:ring-offset-0">
-                                        <LayoutGrid className="h-4 w-4" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-56 bg-white">
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="icon" aria-label="Columns">
+                                    <LayoutGrid className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56 bg-white">
                                     {Object.keys(visibleColumns).map((col) => (
                                         <DropdownMenuCheckboxItem
                                             key={col}
@@ -309,29 +347,29 @@ const PayrollInvoices = () => {
                                             {col.replace(/([A-Z])/g, ' $1').trim()}
                                         </DropdownMenuCheckboxItem>
                                     ))}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
 
-                <div className="border-t">
+                <div className="mt-4">
                     {viewMode === "table" ? (
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                                    {visibleColumns.invoiceNo && <TableHead className="font-semibold text-slate-700 uppercase text-[11px] tracking-wider">Invoice #</TableHead>}
-                                    {visibleColumns.to && <TableHead className="font-semibold text-slate-700 uppercase text-[11px] tracking-wider">To</TableHead>}
-                                    {visibleColumns.cycle && <TableHead className="font-semibold text-slate-700 uppercase text-[11px] tracking-wider">Cycle</TableHead>}
-                                    {visibleColumns.amount && <TableHead className="font-semibold text-slate-700 uppercase text-[11px] tracking-wider">Invoice Amount</TableHead>}
-                                    {visibleColumns.payable && <TableHead className="font-semibold text-slate-700 uppercase text-[11px] tracking-wider">Payable Amount</TableHead>}
-                                    {visibleColumns.status && <TableHead className="font-semibold text-slate-700 uppercase text-[11px] tracking-wider text-center">Status</TableHead>}
-                                    {visibleColumns.action && <TableHead className="font-semibold text-slate-700 uppercase text-[11px] tracking-wider text-center">Action</TableHead>}
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {paginatedInvoices.map((inv) => (
-                                    <TableRow key={inv.id} className="hover:bg-slate-50/50">
+                        <div className="overflow-hidden rounded-lg border bg-card shadow-sm">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="border-b bg-muted/40">
+                                        {visibleColumns.invoiceNo && <TableHead className="px-4 text-left text-xs font-semibold uppercase text-muted-foreground">Invoice #</TableHead>}
+                                        {visibleColumns.to && <TableHead className="px-4 text-left text-xs font-semibold uppercase text-muted-foreground">To</TableHead>}
+                                        {visibleColumns.cycle && <TableHead className="px-4 text-left text-xs font-semibold uppercase text-muted-foreground">Cycle</TableHead>}
+                                        {visibleColumns.amount && <TableHead className="px-4 text-left text-xs font-semibold uppercase text-muted-foreground">Invoice Amount</TableHead>}
+                                        {visibleColumns.payable && <TableHead className="px-4 text-left text-xs font-semibold uppercase text-muted-foreground">Payable Amount</TableHead>}
+                                        {visibleColumns.status && <TableHead className="px-4 text-center text-xs font-semibold uppercase text-muted-foreground">Status</TableHead>}
+                                        {visibleColumns.action && <TableHead className="px-4 text-center text-xs font-semibold uppercase text-muted-foreground">Action</TableHead>}
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {paginatedInvoices.map((inv) => (
+                                        <TableRow key={inv.id} className="hover:bg-muted/30">
                                         {visibleColumns.invoiceNo && <TableCell className={`font-medium text-slate-900 ${rowPaddingClass}`}>{inv.invoiceNo}</TableCell>}
                                         {visibleColumns.to && <TableCell className={`text-slate-600 ${rowPaddingClass}`}>{inv.to}</TableCell>}
                                         {visibleColumns.cycle && <TableCell className={`text-slate-600 ${rowPaddingClass}`}>{inv.cycle}</TableCell>}
@@ -385,21 +423,22 @@ const PayrollInvoices = () => {
                                                 </div>
                                             </TableCell>
                                         )}
-                                    </TableRow>
-                                ))}
-                                {paginatedInvoices.length === 0 && (
-                                    <TableRow>
-                                        <TableCell colSpan={Object.values(visibleColumns).filter(Boolean).length} className="h-32 text-center text-muted-foreground">
-                                            No invoices found.
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
+                                        </TableRow>
+                                    ))}
+                                    {paginatedInvoices.length === 0 && (
+                                        <TableRow>
+                                            <TableCell colSpan={Object.values(visibleColumns).filter(Boolean).length} className="px-4 py-6 text-center text-sm text-muted-foreground">
+                                                No invoices found.
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
                     ) : (
-                        <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 bg-slate-50/30">
+                        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                             {paginatedInvoices.map((inv) => (
-                                <Card key={inv.id} className="overflow-hidden border-slate-200 hover:shadow-md transition-shadow">
+                                <Card key={inv.id} className="rounded-lg border bg-card shadow-sm">
                                     <CardContent className="p-4">
                                         <div className="flex justify-between items-start mb-4">
                                             <div>
@@ -474,41 +513,45 @@ const PayrollInvoices = () => {
                     )}
                 </div>
 
-                <div className="p-4 border-t flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                        <span>Showing {startIndex + 1}-{Math.min(startIndex + pageSize, totalCount)} of {totalCount}</span>
+                <div className="mt-4 flex flex-col justify-between gap-4 px-2 lg:flex-row lg:items-center">
+                    <div className="flex-1 text-sm text-muted-foreground">
+                        Showing {totalCount === 0 ? 0 : startIndex + 1}-{endIndex} of {totalCount}
                     </div>
                     
-                    <div className="flex items-center gap-6">
-                        <div className="flex items-center gap-2">
-                            <span>Rows per page</span>
-                            <Select value={pageSize.toString()} onValueChange={(v) => setPageSize(Number(v))}>
-                                <SelectTrigger className="w-16 h-8 bg-white">
-                                    <SelectValue />
+                    <div className="flex flex-col space-y-2 text-sm lg:flex-row lg:items-center lg:space-x-8 lg:space-y-0">
+                        <div className="flex items-center space-x-2">
+                            <span className="font-medium">Rows per page</span>
+                            <Select value={`${pageSize}`} onValueChange={(v) => handlePageSizeChange(Number(v))}>
+                                <SelectTrigger className="h-8 w-[70px]">
+                                    <SelectValue placeholder={`${pageSize}`} />
                                 </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="10">10</SelectItem>
-                                    <SelectItem value="20">20</SelectItem>
-                                    <SelectItem value="50">50</SelectItem>
+                                <SelectContent side="top">
+                                    {[10, 20, 30, 40, 50].map((size) => (
+                                        <SelectItem key={size} value={`${size}`}>
+                                            {size}
+                                        </SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                         </div>
 
-                        <div className="flex items-center gap-4">
-                            <span>Page {currentPage} of {pageCount}</span>
-                            <div className="flex items-center gap-1">
-                                <Button variant="outline" size="icon" className="h-8 w-8 rounded-md" onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
+                        <div className="flex items-center">
+                            <div className="flex items-center justify-center font-medium lg:w-[100px]">
+                                Page {totalCount === 0 ? 0 : safeCurrentPage} of {pageCount}
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <Button variant="outline" className="hidden h-8 w-8 p-0 lg:flex" onClick={() => handlePageChange(1)} disabled={safeCurrentPage === 1 || totalCount === 0}>
                                     <ChevronsLeft className="h-4 w-4" />
                                 </Button>
-                                <Button variant="outline" className="h-8 px-3 rounded-md text-xs flex items-center gap-1" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
+                                <Button variant="outline" onClick={() => handlePageChange(safeCurrentPage - 1)} disabled={safeCurrentPage === 1 || totalCount === 0}>
                                     <ChevronLeft className="h-4 w-4" />
                                     Previous
                                 </Button>
-                                <Button variant="outline" className="h-8 px-3 rounded-md text-xs flex items-center gap-1" onClick={() => setCurrentPage(p => Math.min(pageCount, p + 1))} disabled={currentPage === pageCount}>
+                                <Button variant="outline" onClick={() => handlePageChange(safeCurrentPage + 1)} disabled={safeCurrentPage >= pageCount || totalCount === 0}>
                                     Next
                                     <ChevronRight className="h-4 w-4" />
                                 </Button>
-                                <Button variant="outline" size="icon" className="h-8 w-8 rounded-md" onClick={() => setCurrentPage(pageCount)} disabled={currentPage === pageCount}>
+                                <Button variant="outline" className="hidden h-8 w-8 p-0 lg:flex" onClick={() => handlePageChange(pageCount)} disabled={safeCurrentPage >= pageCount || totalCount === 0}>
                                     <ChevronsRight className="h-4 w-4" />
                                 </Button>
                             </div>

@@ -47,6 +47,8 @@ export const PROTECTED_ROUTES = {
     ADMIN_EDIT_CURRENCY: "/admin/system-setup/currencies/edit/:id",
     ADMIN_ADD_DOCUMENT: "/admin/system-setup/documents/add",
     ADMIN_EDIT_DOCUMENT: "/admin/system-setup/documents/edit/:id",
+    AVATAR_UPDATE_PROFILE: "/avatar/update-profile",
+    AVATAR_CHANGE_PASSWORD: "/avatar/change-password",
 };
 export const BASE_ROUTE = {
     LOGIN: "/",
