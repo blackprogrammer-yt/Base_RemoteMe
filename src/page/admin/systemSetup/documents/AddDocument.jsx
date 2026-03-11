@@ -54,21 +54,21 @@ const AddDocument = () => {
                 <div className="flex min-w-0 flex-auto flex-col gap-2 sm:flex-row sm:items-center justify-between">
                     <div className="flex items-center gap-2">
                         <FileText className="h-6 w-6 text-primary" />
-                        <h2 className="text-2xl font-bold tracking-tight text-slate-800">
+                        <h2 className="text-2xl font-bold tracking-tight text-foreground">
                             Add New Document
                         </h2>
                     </div>
                     <div className="flex items-center gap-2">
                         <Button
                             onClick={handleSave}
-                            className="h-9 gap-2 bg-slate-900 hover:bg-slate-800 text-white"
+                            className="h-9 gap-2 bg-primary hover:bg-primary/90"
                         >
                             <ClipboardCheck className="h-4 w-4" />
                             <span>Save</span>
                         </Button>
                         <Button
                             variant="outline"
-                            className="h-9 gap-2 border-blue-200 text-blue-600 hover:bg-blue-50"
+                            className="h-9 gap-2"
                             onClick={handleBack}
                         >
                             <ArrowLeft className="h-4 w-4" />
@@ -79,13 +79,13 @@ const AddDocument = () => {
             </div>
 
             {/* Main content box */}
-            <div className="rounded-lg border bg-white overflow-hidden">
+            <div className="rounded-lg border bg-card overflow-hidden dark:border dark:border-border/50">
                 <div className="p-6">
-                    <Card className="border-slate-200 shadow-none">
+                    <Card className="shadow-none border-0">
                         <CardContent className="p-6 space-y-6">
                             {/* Title Field */}
                             <div className="space-y-2">
-                                <Label htmlFor="title" className="text-sm font-semibold text-slate-700">
+                                <Label htmlFor="title" className="text-sm font-semibold text-foreground">
                                     Title
                                 </Label>
                                 <Input
@@ -93,13 +93,13 @@ const AddDocument = () => {
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
                                     placeholder="Enter document title"
-                                    className="h-10 border-slate-200 focus:border-primary focus:ring-primary/20"
+                                    className="h-10"
                                 />
                             </div>
 
                             {/* Document For Field */}
                             <div className="space-y-2">
-                                <Label className="text-sm font-semibold text-slate-700">
+                                <Label className="text-sm font-semibold text-foreground">
                                     Document For
                                 </Label>
                                 <div className="flex items-center gap-6 pt-1">
@@ -111,11 +111,11 @@ const AddDocument = () => {
                                                 value="organization"
                                                 checked={documentFor === "organization"}
                                                 onChange={() => setDocumentFor("organization")}
-                                                className="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-slate-300 checked:border-primary checked:bg-primary transition-all"
+                                                className="peer h-4 w-4 cursor-pointer appearance-none rounded-full border checked:border-primary checked:bg-primary transition-all"
                                             />
                                             <div className="absolute h-1.5 w-1.5 rounded-full bg-white opacity-0 peer-checked:opacity-100" />
                                         </div>
-                                        <span className="text-sm text-slate-600 group-hover:text-slate-900">Organization</span>
+                                        <span className="text-sm text-muted-foreground group-hover:text-foreground">Organization</span>
                                     </label>
                                     <label className="flex items-center gap-2 cursor-pointer group">
                                         <div className="relative flex items-center justify-center">
@@ -125,11 +125,11 @@ const AddDocument = () => {
                                                 value="employee"
                                                 checked={documentFor === "employee"}
                                                 onChange={() => setDocumentFor("employee")}
-                                                className="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-slate-300 checked:border-primary checked:bg-primary transition-all"
+                                                className="peer h-4 w-4 cursor-pointer appearance-none rounded-full border checked:border-primary checked:bg-primary transition-all"
                                             />
                                             <div className="absolute h-1.5 w-1.5 rounded-full bg-white opacity-0 peer-checked:opacity-100" />
                                         </div>
-                                        <span className="text-sm text-slate-600 group-hover:text-slate-900">Employee</span>
+                                        <span className="text-sm text-muted-foreground group-hover:text-foreground">Employee</span>
                                     </label>
                                     <label className="flex items-center gap-2 cursor-pointer group">
                                         <div className="relative flex items-center justify-center">
@@ -139,21 +139,21 @@ const AddDocument = () => {
                                                 value="both"
                                                 checked={documentFor === "both"}
                                                 onChange={() => setDocumentFor("both")}
-                                                className="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-slate-300 checked:border-primary checked:bg-primary transition-all"
+                                                className="peer h-4 w-4 cursor-pointer appearance-none rounded-full border checked:border-primary checked:bg-primary transition-all"
                                             />
                                             <div className="absolute h-1.5 w-1.5 rounded-full bg-white opacity-0 peer-checked:opacity-100" />
                                         </div>
-                                        <span className="text-sm text-slate-600 group-hover:text-slate-900">Both</span>
+                                        <span className="text-sm text-muted-foreground group-hover:text-foreground">Both</span>
                                     </label>
                                 </div>
                             </div>
 
                             {/* File Upload Field */}
                             <div className="space-y-2">
-                                <Label className="text-sm font-semibold text-slate-700">
+                                <Label className="text-sm font-semibold text-foreground">
                                     Document File (PDF only for signature placement)
                                 </Label>
-                                <div className="flex items-center overflow-hidden rounded-md border border-slate-200">
+                                <div className="flex items-center overflow-hidden rounded-md border">
                                     <label className="cursor-pointer">
                                         <input
                                             type="file"
@@ -161,21 +161,21 @@ const AddDocument = () => {
                                             className="hidden"
                                             onChange={handleFileChange}
                                         />
-                                        <span className="inline-flex h-10 items-center bg-slate-100 px-4 text-sm font-medium text-slate-600 hover:bg-slate-200 border-r border-slate-200">
+                                        <span className="inline-flex h-10 items-center bg-muted px-4 text-sm font-medium text-foreground hover:bg-muted/80 border-r">
                                             Choose File
                                         </span>
                                     </label>
-                                    <span className="flex-1 px-4 text-sm text-slate-500 truncate">
+                                    <span className="flex-1 px-4 text-sm text-muted-foreground truncate">
                                         {fileName || "No file chosen"}
                                     </span>
                                 </div>
                             </div>
 
                             {/* Footer save button inside card area */}
-                            <div className="flex justify-end pt-4 border-t border-slate-100 mt-6">
+                            <div className="flex justify-end pt-4 border-t mt-6">
                                 <Button
                                     onClick={handleSave}
-                                    className="h-10 gap-2 bg-slate-900 hover:bg-slate-800 text-white"
+                                    className="h-10 gap-2 bg-primary hover:bg-primary/90"
                                 >
                                     <ClipboardCheck className="h-4 w-4" />
                                     <span>Save</span>

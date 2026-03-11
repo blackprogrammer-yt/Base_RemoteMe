@@ -6,7 +6,6 @@ import {
 	ChevronsLeft,
 	ChevronsRight,
 	Columns3,
-	GripVertical,
 	LayoutGrid,
 	Plus,
 	Search,
@@ -17,7 +16,6 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
 	Table,
@@ -196,7 +194,7 @@ const OrganizationAdmin = () => {
 
 		if (key === "email") {
 			return (
-				<TableCell className={`px-4 text-sm ${rowPaddingClass}`}>
+				<TableCell className={`px-4 text-sm text-muted-foreground ${rowPaddingClass}`}>
 					{admin.email}
 				</TableCell>
 			);
@@ -214,12 +212,12 @@ const OrganizationAdmin = () => {
 			return (
 				<TableCell className={`px-4 ${rowPaddingClass}`}>
 					<Badge
-						className={`inline-flex items-center rounded-sm border-0 px-2 py-1 text-xs font-semibold uppercase ${admin.loginStatus
+						className={`pointer-events-none inline-flex items-center rounded-sm border-0 px-2 py-1 text-xs font-semibold uppercase ${admin.loginStatus
 								? "bg-emerald-500/10 text-emerald-700"
 								: "bg-gray-500/10 text-gray-700"
 							}`}
 					>
-						{admin.loginStatus ? "Active" : "Inactive"}
+						<span>{admin.loginStatus ? "Active" : "Inactive"}</span>
 					</Badge>
 				</TableCell>
 			);
@@ -238,22 +236,24 @@ const OrganizationAdmin = () => {
 					</div>
 					<Button
 						size="sm"
-						className="gap-2 bg-black hover:bg-gray-900 text-white"
+						className="gap-2"
 						onClick={() => navigate(PROTECTED_ROUTES.ORGANIZATION_SYSTEM_SETUP_MANAGE_ADMIN_ADD)}
 					>
 						<Plus className="h-4 w-4" />
 						Add Admin
 					</Button>
 				</div>
-			</div>
 
-			<Card className="shadow-sm">
-				<CardContent className="space-y-4 p-5">
-					<div className="flex items-center justify-end gap-3">
-						<div className="relative w-[300px]">
+			<div className="w-full rounded-lg border bg-card px-2 py-2 md:px-3">
+				<div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+				<div className="flex flex-wrap items-center gap-2">
+					{/* Space for filter buttons if needed */}
+				</div>
+				<div className="flex w-full flex-wrap items-center justify-start gap-2 md:w-auto md:justify-end">
+					<div className="relative w-full md:w-[260px]">
 							<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 							<Input
-								placeholder="Search admins..."
+								placeholder="Search"
 								value={searchQuery}
 								onChange={(event) => setSearchQuery(event.target.value)}
 								className="h-9 w-full pl-9 pr-8"
@@ -270,115 +270,113 @@ const OrganizationAdmin = () => {
 							) : null}
 						</div>
 
-						<div className="flex items-center gap-2">
-							<DropdownMenu>
-								<DropdownMenuTrigger asChild>
-									<Button
-										variant="outline"
-										size="icon"
-										aria-label="Density"
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button
+									variant="outline"
+									size="icon"
+									aria-label="Density"
+								>
+									<SlidersHorizontal />
+								</Button>
+						</DropdownMenuTrigger>
+							<DropdownMenuContent align="end">
+								{["compact", "standard", "comfortable"].map((option) => (
+									<DropdownMenuCheckboxItem
+										key={option}
+										className="capitalize"
+										checked={density === option}
+										onCheckedChange={() => setDensity(option)}
 									>
-										<SlidersHorizontal className="h-4 w-4" />
-									</Button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent align="end">
-									{["compact", "standard", "comfortable"].map((option) => (
-										<DropdownMenuCheckboxItem
-											key={option}
-											className="capitalize"
-											checked={density === option}
-											onCheckedChange={() => setDensity(option)}
-										>
-											{option}
-										</DropdownMenuCheckboxItem>
-									))}
-								</DropdownMenuContent>
-							</DropdownMenu>
+										{option}
+									</DropdownMenuCheckboxItem>
+								))}
+							</DropdownMenuContent>
+						</DropdownMenu>
 
-							<DropdownMenu>
-								<DropdownMenuTrigger asChild>
-									<Button
-										variant="outline"
-										size="icon"
-										aria-label="View"
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button
+									variant="outline"
+									size="icon"
+									aria-label="View"
+								>
+									<LayoutGrid />
+								</Button>
+						</DropdownMenuTrigger>
+							<DropdownMenuContent align="end">
+								{["table", "cards"].map((option) => (
+									<DropdownMenuCheckboxItem
+										key={option}
+										className="capitalize"
+										checked={viewMode === option}
+										onCheckedChange={() => setViewMode(option)}
 									>
-										<LayoutGrid className="h-4 w-4" />
-									</Button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent align="end">
-									{["table", "cards"].map((option) => (
-										<DropdownMenuCheckboxItem
-											key={option}
-											className="capitalize"
-											checked={viewMode === option}
-											onCheckedChange={() => setViewMode(option)}
-										>
-											{option}
-										</DropdownMenuCheckboxItem>
-									))}
-								</DropdownMenuContent>
-							</DropdownMenu>
+										{option}
+									</DropdownMenuCheckboxItem>
+								))}
+							</DropdownMenuContent>
+						</DropdownMenu>
 
-							<DropdownMenu>
-								<DropdownMenuTrigger asChild>
-									<Button
-										variant="outline"
-										size="icon"
-										aria-label="Columns"
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button
+									variant="outline"
+									size="icon"
+									aria-label="Columns"
+								>
+									<Columns3 />
+								</Button>
+						</DropdownMenuTrigger>
+							<DropdownMenuContent align="end">
+								{columnDefinitions.map((column) => (
+									<DropdownMenuCheckboxItem
+										key={column.key}
+										checked={visibleColumns[column.key]}
+										onCheckedChange={(checked) =>
+											setVisibleColumns((prev) => ({
+												...prev,
+												[column.key]: checked,
+											}))
+										}
 									>
-										<Columns3 className="h-4 w-4" />
-									</Button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent align="end" className="w-48">
-									{columnDefinitions.map((column) => (
-										<DropdownMenuCheckboxItem
-											key={column.key}
-											checked={visibleColumns[column.key]}
-											onCheckedChange={(checked) =>
-												setVisibleColumns((prev) => ({
-													...prev,
-													[column.key]: checked,
-												}))
-											}
-										>
-											{column.label}
-										</DropdownMenuCheckboxItem>
-									))}
-								</DropdownMenuContent>
-							</DropdownMenu>
-						</div>
+										{column.label}
+									</DropdownMenuCheckboxItem>
+								))}
+							</DropdownMenuContent>
+						</DropdownMenu>
 					</div>
+				</div>
 
-					<div className="mt-4">
-						{viewMode === "table" ? (
-							<div className="overflow-hidden rounded-lg border bg-card shadow-sm">
-								<Table>
-									<TableHeader>
-										<TableRow className="border-b bg-muted/40">
-											{visibleColumnOrder.map((key) => (
-												<TableHead
-													key={key}
-													draggable
-													onDragStart={() => handleDragStart(key)}
-													onDragOver={(event) => event.preventDefault()}
-													onDrop={() => handleDrop(key)}
-													className="cursor-move select-none px-4 text-left text-xs font-semibold uppercase text-muted-foreground"
-												>
-													<span className="inline-flex items-center gap-2">
-														<GripVertical className="h-3 w-3 text-muted-foreground/70" />
-														{columnLabelMap[key]}
-													</span>
-												</TableHead>
-											))}
-										</TableRow>
-									</TableHeader>
-									<TableBody>
-										{paginatedAdmins.map((admin, idx) => (
-											<TableRow
-												key={admin.id}
-												className={`hover:bg-muted/30 ${idx % 2 === 0 ? "" : "bg-muted/30"
-													}`}
+			<div className="mt-4">
+					{viewMode === "table" ? (
+						<div className="overflow-hidden rounded-lg border bg-card shadow-sm">
+							<Table>
+								<TableHeader>
+									<TableRow className="border-b bg-muted/40">
+										{visibleColumnOrder.map((key) => (
+											<TableHead
+												key={key}
+												draggable
+												onDragStart={() => handleDragStart(key)}
+												onDragOver={(event) => event.preventDefault()}
+												onDrop={() => handleDrop(key)}
+												className="cursor-move select-none px-4 text-left text-xs font-semibold uppercase text-muted-foreground"
 											>
+												<span className="inline-flex items-center gap-2">
+													<span className="text-muted-foreground/70">::</span>
+													{columnLabelMap[key]}
+												</span>
+											</TableHead>
+										))}
+									</TableRow>
+								</TableHeader>
+								<TableBody>
+									{paginatedAdmins.map((admin) => (
+										<TableRow
+											key={admin.id}
+											className="hover:bg-muted/30"
+										>
 												{visibleColumnOrder.map((key) => (
 													<Fragment key={key}>
 														{renderCell(admin, key)}
@@ -398,21 +396,18 @@ const OrganizationAdmin = () => {
 												{visibleColumns.name && (
 													<p className="text-sm font-semibold">{admin.name}</p>
 												)}
-												{visibleColumns.loginStatus && (
-													<div className="mt-2">
-														<Badge
-															className={`inline-flex items-center rounded-sm border-0 px-2 py-1 text-xs font-semibold uppercase ${admin.loginStatus
-																	? "bg-emerald-500/10 text-emerald-700"
-																	: "bg-gray-500/10 text-gray-700"
-																}`}
-														>
-															{admin.loginStatus ? "Active" : "Inactive"}
-														</Badge>
-													</div>
-												)}
 											</div>
+											{visibleColumns.loginStatus && (
+												<Badge
+													className={`pointer-events-none inline-flex items-center rounded-sm border-0 px-2 py-1 text-xs font-semibold uppercase ${admin.loginStatus
+														? "bg-emerald-500/10 text-emerald-700"
+														: "bg-gray-500/10 text-gray-700"
+														}`}
+												>
+													<span>{admin.loginStatus ? "Active" : "Inactive"}</span>
+												</Badge>
+											)}
 										</div>
-
 										<div className="mt-4 space-y-3">
 											{visibleColumns.email && (
 												<div>
@@ -430,22 +425,19 @@ const OrganizationAdmin = () => {
 												</div>
 											)}
 										</div>
-
 									</div>
 								))}
 							</div>
 						)}
 					</div>
 
-					<div className="mt-4 flex flex-col justify-between gap-4 px-2 lg:flex-row lg:items-center">
-						<div className="flex-1 text-sm text-muted-foreground">
-							Showing {totalCount === 0 ? 0 : startIndex + 1}-
-							{endIndex} of {totalCount} records
-						</div>
-
-						<div className="flex flex-col space-y-2 text-sm lg:flex-row lg:items-center lg:space-x-8 lg:space-y-0">
-							<div className="flex items-center space-x-2">
-								<span className="font-medium">Rows per page</span>
+				<div className="mt-4 flex flex-col justify-between gap-4 px-2 lg:flex-row lg:items-center">
+					<div className="flex-1 text-sm text-muted-foreground">
+						Showing {totalCount === 0 ? 0 : startIndex + 1}-{endIndex} of {totalCount}
+					</div>
+					<div className="flex flex-col space-y-2 text-sm lg:flex-row lg:items-center lg:space-x-8 lg:space-y-0">
+						<div className="flex items-center space-x-2">
+							<span className="font-medium">Rows per page</span>
 								<Select
 									value={`${pageSize}`}
 									onValueChange={(value) =>
@@ -516,8 +508,8 @@ const OrganizationAdmin = () => {
 							</div>
 						</div>
 					</div>
-				</CardContent>
-			</Card>
+				</div>
+			</div>
 		</main>
 	);
 };

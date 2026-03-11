@@ -5,15 +5,18 @@ import { NuqsAdapter } from "nuqs/adapters/react";
 import { Toaster } from "./components/ui/toaster.jsx";
 import App from "./App.jsx";
 import QueryProvider from "./context/query-provider.jsx";
+import { ThemeProvider } from "./context/theme-provider.jsx";
 import "./index.css";
 
 createRoot(document.getElementById("root")).render(
     <StrictMode>
-        <QueryProvider>
-            <NuqsAdapter>
-                <App />
-            </NuqsAdapter>
-            <Toaster />
-        </QueryProvider>
+        <ThemeProvider>
+            <QueryProvider>
+                <NuqsAdapter>
+                    <App />
+                </NuqsAdapter>
+                <Toaster />
+            </QueryProvider>
+        </ThemeProvider>
     </StrictMode>
 );

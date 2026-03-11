@@ -3,12 +3,16 @@ import {
     Filter,
     Search,
     SlidersHorizontal,
-    Pencil,
     SquarePen,
     Columns3,
     LayoutGrid,
     Gift,
     Plus,
+    X,
+    ChevronLeft,
+    ChevronRight,
+    ChevronsLeft,
+    ChevronsRight,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -72,6 +76,7 @@ const Benefits = () => {
     const [searchQuery, setSearchQuery] = useState("");
     const [activeStatus, setActiveStatus] = useState("all");
     const [density, setDensity] = useState("compact");
+    const [viewMode, setViewMode] = useState("table");
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [visibleColumns, setVisibleColumns] = useState({
@@ -82,17 +87,72 @@ const Benefits = () => {
         action: true,
     });
 
+    const [columnOrder, setColumnOrder] = useState([
+        "name",
+        "description",
+        "status",
+        "toggle",
+        "action",
+    ]);
+    const [draggedColumn, setDraggedColumn] = useState(null);
+
+    const columnDefinitions = [
+        { key: "name", label: "Name" },
+        { key: "description", label: "Description" },
+        { key: "status", label: "Status" },
+        { key: "toggle", label: "Toggle Status" },
+        { key: "action", label: "Action" },
+    ];
+
+    const columnLabelMap = columnDefinitions.reduce((acc, column) => {
+        acc[column.key] = column.label;
+        return acc;
+    }, {});
+
+    const densityClasses = {
+        compact: "py-2",
+        standard: "py-3",
+        comfortable: "py-4",
+    };
+
+    const rowPaddingClass = densityClasses[density] || densityClasses.compact;
+
+    const visibleColumnOrder = columnOrder.filter((key) => visibleColumns[key]);
+
+    const handleDragStart = (key) => {
+        setDraggedColumn(key);
+    };
+
+    const handleDrop = (targetKey) => {
+        if (!draggedColumn || draggedColumn === targetKey) return;
+
+        const newOrder = [...columnOrder];
+        const draggedIdx = newOrder.indexOf(draggedColumn);
+        const targetIdx = newOrder.indexOf(targetKey);
+
+        newOrder.splice(draggedIdx, 1);
+        newOrder.splice(targetIdx, 0, draggedColumn);
+
+        setColumnOrder(newOrder);
+        setDraggedColumn(null);
+    };
+
     const filteredBenefits = useMemo(() => {
-        const normalized = searchQuery.trim().toLowerCase();
+        const normalizedQuery = searchQuery.trim().toLowerCase();
+        
         return benefits.filter((item) => {
             const matchesStatus =
                 activeStatus === "all" ||
                 (activeStatus === "active" && item.active) ||
                 (activeStatus === "inactive" && !item.active);
 
-            if (!normalized) return matchesStatus;
-            const text = [item.name, item.description].join(" ").toLowerCase();
-            return matchesStatus && text.includes(normalized);
+            if (!normalizedQuery) return matchesStatus;
+            
+            const searchable = [item.name, item.description]
+                .join(" ")
+                .toLowerCase();
+
+            return matchesStatus && searchable.includes(normalizedQuery);
         });
     }, [benefits, searchQuery, activeStatus]);
 
@@ -101,22 +161,20 @@ const Benefits = () => {
     const safeCurrentPage = totalCount === 0 ? 1 : Math.min(currentPage, pageCount);
     const startIndex = totalCount === 0 ? 0 : (safeCurrentPage - 1) * pageSize;
     const endIndex = totalCount === 0 ? 0 : Math.min(startIndex + pageSize, totalCount);
-    const paginatedBenefits = filteredBenefits.slice(startIndex, endIndex);
-
-    const rowPaddingClass =
-        density === "compact" ? "py-2.5" : density === "comfortable" ? "py-3.5" : "py-4";
+    const paginatedBenefits =
+        totalCount === 0 ? [] : filteredBenefits.slice(startIndex, endIndex);
 
     const getStatusBadge = (isActive) => {
         if (isActive) {
             return (
-                <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-emerald-500/10 px-2 py-1 text-xs font-semibold uppercase text-emerald-700">
-                    <span>Active</span>
+                <Badge className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20 border-0 text-xs font-semibold uppercase">
+                    Active
                 </Badge>
             );
         }
         return (
-            <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-slate-400/10 px-2 py-1 text-xs font-semibold uppercase text-slate-700">
-                <span>Inactive</span>
+            <Badge className="bg-slate-400/10 text-slate-700 dark:text-slate-400 hover:bg-slate-400/20 border-0 text-xs font-semibold uppercase">
+                Inactive
             </Badge>
         );
     };
@@ -129,15 +187,80 @@ const Benefits = () => {
         );
     };
 
-    const handlePageChange = (page) => {
-        if (page < 1) return;
-        const last = pageCount;
-        setCurrentPage(Math.min(page, last));
+    const handlePageChange = (newPage) => {
+        if (totalCount === 0) return;
+        const clampedPage = Math.max(1, Math.min(newPage, pageCount));
+        setCurrentPage(clampedPage);
     };
 
-    const handlePageSizeChange = (size) => {
-        setPageSize(size);
+    const handlePageSizeChange = (newSize) => {
+        setPageSize(newSize);
         setCurrentPage(1);
+    };
+
+    const renderCell = (item, key) => {
+        if (key === "name") {
+            return (
+                <TableCell key={key} className={`px-4 text-sm font-medium ${rowPaddingClass}`}>
+                    {item.name}
+                </TableCell>
+            );
+        }
+
+        if (key === "description") {
+            return (
+                <TableCell key={key} className={`px-4 text-sm ${rowPaddingClass}`}>
+                    {item.description}
+                </TableCell>
+            );
+        }
+
+        if (key === "status") {
+            return (
+                <TableCell key={key} className={`px-4 text-sm text-center ${rowPaddingClass}`}>
+                    {getStatusBadge(item.active)}
+                </TableCell>
+            );
+        }
+
+        if (key === "toggle") {
+            return (
+                <TableCell key={key} className={`px-4 text-sm text-center ${rowPaddingClass}`}>
+                    <div className="flex items-center justify-center">
+                        <Switch
+                            checked={item.active}
+                            onCheckedChange={() => handleToggleActive(item.id)}
+                        />
+                    </div>
+                </TableCell>
+            );
+        }
+
+        if (key === "action") {
+            return (
+                <TableCell key={key} className={`px-4 text-sm ${rowPaddingClass}`}>
+                    <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="gap-2 px-3 text-xs"
+                        onClick={() =>
+                            navigate(
+                                PROTECTED_ROUTES.ADMIN_EDIT_BENEFIT.replace(
+                                    ":id",
+                                    String(item.id),
+                                ),
+                            )
+                        }
+                    >
+                        <SquarePen className="h-3.5 w-3.5" />
+                        <span>Edit</span>
+                    </Button>
+                </TableCell>
+            );
+        }
+
+        return null;
     };
 
     return (
@@ -145,328 +268,301 @@ const Benefits = () => {
             <div className="flex flex-auto flex-col py-2">
                 <div className="flex min-w-0 flex-auto flex-col gap-2 sm:flex-row sm:items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <Gift className="h-6 w-6 text-primary" />
-                        <h2 className="text-2xl font-bold tracking-tight text-slate-800">
-                            Benefits
-                        </h2>
+                        <Gift className="h-5 w-5 text-muted-foreground" />
+                        <h2 className="text-2xl font-bold tracking-tight">Benefits</h2>
                     </div>
-                    <Button
+                    <Button 
                         onClick={() => navigate(PROTECTED_ROUTES.ADMIN_ADD_BENEFIT)}
-                        className="h-9 gap-2 bg-slate-900 hover:bg-slate-800 text-white"
+                        className="bg-slate-900 hover:bg-slate-800 text-white"
                     >
-                        <Plus className="h-4 w-4" />
-                        <span>Create Benefit</span>
+                        <Plus className="mr-2 h-4 w-4" /> Create Benefit
                     </Button>
                 </div>
             </div>
 
-            <div className="rounded-lg border bg-white">
-                <div className="flex flex-col gap-3 p-3 md:flex-row md:items-center md:justify-between border-b">
-                    <div className="flex items-center gap-2 w-full">
-                        <Select value="all">
-                            <SelectTrigger className="w-full md:w-64 h-9 bg-slate-50/50">
-                                <SelectValue placeholder="-- All Benefits --" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">-- All Benefits --</SelectItem>
-                            </SelectContent>
-                        </Select>
-
-                        <div className="ml-auto flex items-center gap-2">
-                            <div className="relative w-[260px]">
-                                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                                <Input
-                                    placeholder="Search"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="h-9 w-full pl-9 pr-8"
-                                />
-                                {searchQuery ? (
-                                    <button
-                                        type="button"
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
-                                        onClick={() => setSearchQuery("")}
-                                    >
-                                        ×
-                                    </button>
-                                ) : null}
-                            </div>
-
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        size="icon"
-                                        className="h-8 w-8 rounded-md"
-                                    >
-                                        <Filter className="h-4 w-4" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-40 bg-white">
-                                    {statusFilterOptions.map((option) => (
-                                        <DropdownMenuCheckboxItem
-                                            key={option.key}
-                                            checked={activeStatus === option.key}
-                                            onCheckedChange={() => setActiveStatus(option.key)}
-                                            className="text-sm cursor-pointer"
-                                        >
-                                            {option.label}
-                                        </DropdownMenuCheckboxItem>
-                                    ))}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        size="icon"
-                                        className="h-8 w-8 rounded-md"
-                                    >
-                                        <SlidersHorizontal className="h-4 w-4" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-40 bg-white">
-                                    <DropdownMenuCheckboxItem
-                                        checked={density === "compact"}
-                                        onCheckedChange={() => setDensity("compact")}
-                                        className="text-sm cursor-pointer"
-                                    >
-                                        Compact
-                                    </DropdownMenuCheckboxItem>
-                                    <DropdownMenuCheckboxItem
-                                        checked={density === "comfortable"}
-                                        onCheckedChange={() => setDensity("comfortable")}
-                                        className="text-sm cursor-pointer"
-                                    >
-                                        Comfortable
-                                    </DropdownMenuCheckboxItem>
-                                    <DropdownMenuCheckboxItem
-                                        checked={density === "spacious"}
-                                        onCheckedChange={() => setDensity("spacious")}
-                                        className="text-sm cursor-pointer"
-                                    >
-                                        Spacious
-                                    </DropdownMenuCheckboxItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        size="icon"
-                                        className="h-8 w-8 rounded-md"
-                                    >
-                                        <Columns3 className="h-4 w-4" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-32 bg-white">
-                                    <DropdownMenuCheckboxItem checked className="text-sm cursor-pointer">
-                                        Table
-                                    </DropdownMenuCheckboxItem>
-                                    <DropdownMenuCheckboxItem className="text-sm cursor-pointer">
-                                        Cards
-                                    </DropdownMenuCheckboxItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        size="icon"
-                                        className="h-8 w-8 rounded-md"
-                                    >
-                                        <LayoutGrid className="h-4 w-4" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-56 bg-white">
-                                    {Object.keys(visibleColumns).map((col) => (
-                                        <DropdownMenuCheckboxItem
-                                            key={col}
-                                            checked={visibleColumns[col]}
-                                            onCheckedChange={(v) =>
-                                                setVisibleColumns((p) => ({ ...p, [col]: v }))
-                                            }
-                                            className="text-sm cursor-pointer capitalize"
-                                        >
-                                            {col.replace(/([A-Z])/g, " $1").trim()}
-                                        </DropdownMenuCheckboxItem>
-                                    ))}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
+            <div className="w-full rounded-lg border bg-card px-2 py-3 md:px-3">
+                <div className="flex w-full flex-wrap items-center justify-start gap-2 md:justify-end">
+                    <div className="relative w-full md:w-[260px]">
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                            placeholder="Search benefits..."
+                            value={searchQuery}
+                            onChange={(event) => setSearchQuery(event.target.value)}
+                            className="h-9 w-full pl-9 pr-8"
+                        />
+                        {searchQuery ? (
+                            <button
+                                type="button"
+                                onClick={() => setSearchQuery("")}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-sm p-1 text-muted-foreground hover:bg-muted"
+                                aria-label="Clear search"
+                            >
+                                <X className="h-3.5 w-3.5" />
+                            </button>
+                        ) : null}
                     </div>
-                </div>
 
-                <div className="px-3 py-3">
-                    <div className="rounded-lg border bg-white overflow-hidden">
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                                    {visibleColumns.name && (
-                                        <TableHead className="font-semibold text-slate-700 uppercase text-[11px] tracking-wider">
-                                            Name
-                                        </TableHead>
-                                    )}
-                                    {visibleColumns.description && (
-                                        <TableHead className="font-semibold text-slate-700 uppercase text-[11px] tracking-wider">
-                                            Description
-                                        </TableHead>
-                                    )}
-                                    {visibleColumns.status && (
-                                        <TableHead className="font-semibold text-slate-700 uppercase text-[11px] tracking-wider text-center">
-                                            Status
-                                        </TableHead>
-                                    )}
-                                    {visibleColumns.toggle && (
-                                        <TableHead className="font-semibold text-slate-700 uppercase text-[11px] tracking-wider text-center">
-                                            Toggle Status
-                                        </TableHead>
-                                    )}
-                                    {visibleColumns.action && (
-                                        <TableHead className="font-semibold text-slate-700 uppercase text-[11px] tracking-wider text-center">
-                                            Action
-                                        </TableHead>
-                                    )}
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {paginatedBenefits.map((item) => (
-                                    <TableRow key={item.id} className="hover:bg-slate-50/50">
-                                        {visibleColumns.name && (
-                                            <TableCell className={`font-medium text-slate-900 ${rowPaddingClass}`}>
-                                                {item.name}
-                                            </TableCell>
-                                        )}
-                                        {visibleColumns.description && (
-                                            <TableCell className={`text-slate-600 ${rowPaddingClass}`}>
-                                                {item.description}
-                                            </TableCell>
-                                        )}
-                                        {visibleColumns.status && (
-                                            <TableCell className={`text-center ${rowPaddingClass}`}>
-                                                {getStatusBadge(item.active)}
-                                            </TableCell>
-                                        )}
-                                        {visibleColumns.toggle && (
-                                            <TableCell className={`text-center ${rowPaddingClass}`}>
-                                                <div className="flex items-center justify-center">
-                                                    <Switch
-                                                        checked={item.active}
-                                                        onCheckedChange={() => handleToggleActive(item.id)}
-                                                    />
-                                                </div>
-                                            </TableCell>
-                                        )}
-                                        {visibleColumns.action && (
-                                            <TableCell className={`text-center ${rowPaddingClass}`}>
-                                                <div className="flex items-center justify-center gap-2">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="gap-2 px-3 text-xs"
-                                                        onClick={() =>
-                                                            navigate(
-                                                                PROTECTED_ROUTES.ADMIN_EDIT_BENEFIT.replace(
-                                                                    ":id",
-                                                                    String(item.id),
-                                                                ),
-                                                            )
-                                                        }
-                                                    >
-                                                        <SquarePen className="h-3.5 w-3.5" />
-                                                        <span>Edit</span>
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
-                                        )}
-                                    </TableRow>
-                                ))}
-                                {paginatedBenefits.length === 0 && (
-                                    <TableRow>
-                                        <TableCell
-                                            colSpan={5}
-                                            className="h-32 text-center text-muted-foreground"
-                                        >
-                                            No benefits found.
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </div>
-                </div>
-
-                <div className="mt-auto border-t p-3">
-                    <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
-                        <div className="flex-1 text-sm text-muted-foreground">
-                            Showing {totalCount === 0 ? 0 : startIndex + 1}-{endIndex} of {totalCount}
-                        </div>
-
-                        <div className="flex flex-col space-y-2 text-sm lg:flex-row lg:items-center lg:space-x-8 lg:space-y-0">
-                            <div className="flex items-center space-x-2">
-                                <span className="font-medium">Rows per page</span>
-                                <Select
-                                    value={`${pageSize}`}
-                                    onValueChange={(value) => handlePageSizeChange(Number(value))}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="icon" aria-label="Status Filter">
+                                <Filter className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            {statusFilterOptions.map((option) => (
+                                <DropdownMenuCheckboxItem
+                                    key={option.key}
+                                    checked={activeStatus === option.key}
+                                    onCheckedChange={() => setActiveStatus(option.key)}
                                 >
-                                    <SelectTrigger className="h-8 w-[70px]">
-                                        <SelectValue placeholder={`${pageSize}`} />
-                                    </SelectTrigger>
-                                    <SelectContent side="top">
-                                        {[10, 20, 30, 40, 50].map((size) => (
-                                            <SelectItem key={size} value={`${size}`}>
-                                                {size}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                                    {option.label}
+                                </DropdownMenuCheckboxItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
-                            <div className="flex items-center">
-                                <div className="flex items-center justify-center font-medium lg:w-[100px]">
-                                    Page {totalCount === 0 ? 0 : safeCurrentPage} of {pageCount}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="icon" aria-label="Density">
+                                <SlidersHorizontal className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuCheckboxItem
+                                checked={density === "compact"}
+                                onCheckedChange={() => setDensity("compact")}
+                            >
+                                Compact
+                            </DropdownMenuCheckboxItem>
+                            <DropdownMenuCheckboxItem
+                                checked={density === "standard"}
+                                onCheckedChange={() => setDensity("standard")}
+                            >
+                                Standard
+                            </DropdownMenuCheckboxItem>
+                            <DropdownMenuCheckboxItem
+                                checked={density === "comfortable"}
+                                onCheckedChange={() => setDensity("comfortable")}
+                            >
+                                Comfortable
+                            </DropdownMenuCheckboxItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="icon" aria-label="View Mode">
+                                {viewMode === "table" ? (
+                                    <LayoutGrid className="h-4 w-4" />
+                                ) : (
+                                    <LayoutGrid className="h-4 w-4 text-primary" />
+                                )}
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuCheckboxItem
+                                checked={viewMode === "table"}
+                                onCheckedChange={() => setViewMode("table")}
+                            >
+                                Table View
+                            </DropdownMenuCheckboxItem>
+                            <DropdownMenuCheckboxItem
+                                checked={viewMode === "grid"}
+                                onCheckedChange={() => setViewMode("grid")}
+                            >
+                                Grid View
+                            </DropdownMenuCheckboxItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="icon" aria-label="Columns">
+                                <Columns3 className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            {columnDefinitions.map((column) => (
+                                <DropdownMenuCheckboxItem
+                                    key={column.key}
+                                    className="capitalize"
+                                    checked={visibleColumns[column.key]}
+                                    onCheckedChange={(value) =>
+                                        setVisibleColumns((prev) => ({
+                                            ...prev,
+                                            [column.key]: !!value,
+                                        }))
+                                    }
+                                >
+                                    {column.label}
+                                </DropdownMenuCheckboxItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+
+                <div className="mt-4">
+                    {viewMode === "table" ? (
+                        <div className="overflow-hidden rounded-lg border bg-card shadow-sm">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="border-b bg-muted/40">
+                                        {visibleColumnOrder.map((key) => (
+                                            <TableHead
+                                                key={key}
+                                                draggable
+                                                onDragStart={() => handleDragStart(key)}
+                                                onDragOver={(event) => event.preventDefault()}
+                                                onDrop={() => handleDrop(key)}
+                                                className="cursor-move select-none px-4 text-left text-xs font-semibold uppercase text-muted-foreground"
+                                            >
+                                                <span className="inline-flex items-center gap-2">
+                                                    <span className="text-muted-foreground/70">::</span>
+                                                    {columnLabelMap[key]}
+                                                </span>
+                                            </TableHead>
+                                        ))}
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {paginatedBenefits.length > 0 ? (
+                                        paginatedBenefits.map((item) => (
+                                            <TableRow
+                                                key={item.id}
+                                                className="hover:bg-muted/30"
+                                            >
+                                                {visibleColumnOrder.map((key) =>
+                                                    renderCell(item, key),
+                                                )}
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell
+                                                colSpan={visibleColumnOrder.length}
+                                                className="px-4 py-6 text-center text-sm text-muted-foreground"
+                                            >
+                                                No benefits found.
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    ) : (
+                        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                            {paginatedBenefits.map((item) => (
+                                <div
+                                    key={item.id}
+                                    className="rounded-lg border bg-card p-4 shadow-sm"
+                                >
+                                    <div className="flex items-center justify-between mb-2">
+                                        <h3 className="font-semibold text-sm">
+                                            {item.name}
+                                        </h3>
+                                        {getStatusBadge(item.active)}
+                                    </div>
+                                    <div className="text-xs text-muted-foreground mt-3">
+                                        <div>
+                                            <p className="font-medium text-muted-foreground/70">Description</p>
+                                            <p className="text-foreground">{item.description}</p>
+                                        </div>
+                                    </div>
+                                    <div className="mt-4 pt-4 border-t flex justify-between items-center gap-2">
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            className="gap-2 px-3 text-xs flex-1"
+                                            onClick={() =>
+                                                navigate(
+                                                    PROTECTED_ROUTES.ADMIN_EDIT_BENEFIT.replace(
+                                                        ":id",
+                                                        String(item.id),
+                                                    ),
+                                                )
+                                            }
+                                        >
+                                            <SquarePen className="h-3.5 w-3.5" />
+                                            <span>Edit</span>
+                                        </Button>
+                                        <Switch 
+                                            checked={item.active} 
+                                            onCheckedChange={() => handleToggleActive(item.id)} 
+                                        />
+                                    </div>
                                 </div>
-                                <div className="flex items-center space-x-2">
-                                    <Button
-                                        variant="outline"
-                                        className="h-8 w-8 p-0"
-                                        onClick={() => handlePageChange(1)}
-                                        disabled={safeCurrentPage === 1 || totalCount === 0}
-                                    >
-                                        <span className="sr-only">Go to first page</span>
-                                        {"<<"}
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        className="h-8 px-3"
-                                        onClick={() => handlePageChange(safeCurrentPage - 1)}
-                                        disabled={safeCurrentPage === 1 || totalCount === 0}
-                                    >
-                                        <span className="sr-only">Go to previous page</span>
-                                        Previous
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        className="h-8 px-3"
-                                        onClick={() => handlePageChange(safeCurrentPage + 1)}
-                                        disabled={safeCurrentPage >= pageCount || totalCount === 0}
-                                    >
-                                        <span className="sr-only">Go to next page</span>
-                                        Next
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        className="h-8 w-8 p-0"
-                                        onClick={() => handlePageChange(pageCount)}
-                                        disabled={safeCurrentPage >= pageCount || totalCount === 0}
-                                    >
-                                        <span className="sr-only">Go to last page</span>
-                                        {">>"}
-                                    </Button>
-                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                <div className="mt-4 flex flex-col justify-between gap-4 px-2 lg:flex-row lg:items-center">
+                    <div className="flex-1 text-sm text-muted-foreground">
+                        Showing {totalCount === 0 ? 0 : startIndex + 1}-
+                        {endIndex} of {totalCount} records
+                    </div>
+
+                    <div className="flex flex-col space-y-2 text-sm lg:flex-row lg:items-center lg:space-x-8 lg:space-y-0">
+                        <div className="flex items-center space-x-2">
+                            <span className="font-medium">Rows per page</span>
+                            <Select
+                                value={`${pageSize}`}
+                                onValueChange={(value) => handlePageSizeChange(Number(value))}
+                            >
+                                <SelectTrigger className="h-8 w-[70px]">
+                                    <SelectValue placeholder={`${pageSize}`} />
+                                </SelectTrigger>
+                                <SelectContent side="top">
+                                    {[10, 20, 30, 40, 50].map((size) => (
+                                        <SelectItem key={size} value={`${size}`}>
+                                            {size}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="flex items-center">
+                            <div className="flex items-center justify-center font-medium lg:w-[100px]">
+                                Page {totalCount === 0 ? 0 : safeCurrentPage} of {pageCount}
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <Button
+                                    variant="outline"
+                                    className="hidden h-8 w-8 p-0 lg:flex"
+                                    onClick={() => handlePageChange(1)}
+                                    disabled={safeCurrentPage === 1 || totalCount === 0}
+                                >
+                                    <span className="sr-only">Go to first page</span>
+                                    <ChevronsLeft className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    className="h-8 w-8 p-0"
+                                    onClick={() => handlePageChange(safeCurrentPage - 1)}
+                                    disabled={safeCurrentPage === 1 || totalCount === 0}
+                                >
+                                    <span className="sr-only">Go to previous page</span>
+                                    <ChevronLeft className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    className="h-8 w-8 p-0"
+                                    onClick={() => handlePageChange(safeCurrentPage + 1)}
+                                    disabled={safeCurrentPage === pageCount || totalCount === 0}
+                                >
+                                    <span className="sr-only">Go to next page</span>
+                                    <ChevronRight className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    className="hidden h-8 w-8 p-0 lg:flex"
+                                    onClick={() => handlePageChange(pageCount)}
+                                    disabled={safeCurrentPage >= pageCount || totalCount === 0}
+                                >
+                                    <span className="sr-only">Go to last page</span>
+                                    <ChevronsRight className="h-4 w-4" />
+                                </Button>
                             </div>
                         </div>
                     </div>

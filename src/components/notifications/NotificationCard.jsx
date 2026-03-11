@@ -13,8 +13,8 @@ const ICON_MAP = {
 };
 
 const CARD_VARIANTS = {
-    secondary: "bg-[#1f4f96] text-white",
-    default: "bg-white text-[#111827]",
+    secondary: "bg-primary text-primary-foreground",
+    default: "bg-card text-foreground border border-border/50",
 };
 
 const IconBubble = ({ icon }) => {
@@ -41,7 +41,7 @@ const NotificationCard = ({ item, onClose }) => {
     const timeText = item.timeLabel || formatDistanceToNow(new Date(item.time), { addSuffix: true });
 
     return (
-        <Card className={cn("relative mb-3 flex min-h-[84px] items-start gap-3 rounded-2xl border-0 p-4 shadow-sm", variantClass)}>
+        <Card className={cn("relative mb-3 flex min-h-[84px] items-start gap-3 rounded-2xl p-4 shadow-sm", variantClass)}>
             {item.image ? <AvatarBubble image={item.image} fallback={item.avatarFallback} /> : null}
             {!item.image && item.icon ? <IconBubble icon={item.icon} /> : null}
 
@@ -52,7 +52,7 @@ const NotificationCard = ({ item, onClose }) => {
                 {item.actionLabel ? (
                     <button
                         type="button"
-                        className="mt-3 text-[12px] font-medium text-[#4f6dff]"
+                        className="mt-3 text-[12px] font-medium text-primary hover:text-primary/80"
                     >
                         {item.actionLabel}
                     </button>

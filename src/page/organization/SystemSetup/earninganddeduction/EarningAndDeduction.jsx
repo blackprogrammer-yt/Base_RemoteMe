@@ -7,7 +7,6 @@ import {
 	ChevronsRight,
 	Columns3,
 	FileText,
-	Filter,
 	LayoutGrid,
 	Plus,
 	Search,
@@ -198,7 +197,7 @@ const EarningAndDeduction = () => {
 
 		if (key === "type") {
 			return (
-				<TableCell className={`px-4 text-sm ${rowPaddingClass}`}>
+				<TableCell className={`px-4 ${rowPaddingClass}`}>
 					<Badge className={`pointer-events-none inline-flex items-center rounded-sm border-0 px-2 py-1 text-xs font-semibold uppercase ${getTypeColor(code.type)}`}>
 						<span>{code.type}</span>
 					</Badge>
@@ -208,7 +207,7 @@ const EarningAndDeduction = () => {
 
 		if (key === "action") {
 			return (
-				<TableCell className={`px-4 text-sm ${rowPaddingClass}`}>
+				<TableCell className={`px-4 ${rowPaddingClass}`}>
 					<Button
 						type="button"
 						variant="outline"
@@ -233,15 +232,12 @@ const EarningAndDeduction = () => {
 	return (
 		<main className="flex flex-1 flex-col gap-4 py-4 md:pt-3">
 			<div className="flex flex-auto flex-col py-2">
-				<div className="flex min-w-0 flex-auto flex-col gap-2 sm:flex-row sm:items-center">
+				<div className="flex min-w-0 flex-auto flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
 					<div className="flex flex-auto items-center gap-2">
 						<FileText className="h-5 w-5 text-muted-foreground" />
 						<h2 className="text-2xl font-bold tracking-tight">Earning & Deduction Codes</h2>
 					</div>
-					<Button
-						size="sm"
-						className="gap-2 bg-black hover:bg-gray-900 text-white "
-					>
+					<Button size="sm" className="gap-2">
 						<Plus className="h-4 w-4" />
 						Add Code
 					</Button>
@@ -285,26 +281,6 @@ const EarningAndDeduction = () => {
 								</button>
 							) : null}
 						</div>
-
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button variant="outline" size="icon" aria-label="Filter">
-									<Filter />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end">
-								{typeFilterOptions.map((tab) => (
-									<DropdownMenuCheckboxItem
-										key={tab.key}
-										className="capitalize"
-										checked={selectedType === tab.key}
-										onCheckedChange={() => setSelectedType(tab.key)}
-									>
-										{tab.label}
-									</DropdownMenuCheckboxItem>
-								))}
-							</DropdownMenuContent>
-						</DropdownMenu>
 
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
@@ -398,10 +374,10 @@ const EarningAndDeduction = () => {
 								</TableHeader>
 								<TableBody>
 									{paginatedCodes.length > 0 ? (
-										paginatedCodes.map((code, index) => (
+										paginatedCodes.map((code) => (
 											<TableRow
 												key={code.id}
-												className={index % 2 === 0 ? "bg-muted/30" : "bg-background"}
+												className="hover:bg-muted/30"
 											>
 												{visibleColumnOrder.map((key) => (
 													<Fragment key={key}>
@@ -441,7 +417,7 @@ const EarningAndDeduction = () => {
 											</div>
 											{visibleColumns.type ? (
 												<Badge className={`pointer-events-none inline-flex items-center rounded-sm border-0 px-2 py-1 text-xs font-semibold uppercase ${getTypeColor(code.type)}`}>
-													{code.type}
+													<span>{code.type}</span>
 												</Badge>
 											) : null}
 										</div>
@@ -478,8 +454,7 @@ const EarningAndDeduction = () => {
 
 				<div className="mt-4 flex flex-col justify-between gap-4 px-2 lg:flex-row lg:items-center">
 					<div className="flex-1 text-sm text-muted-foreground">
-						Showing {totalCount === 0 ? 0 : startIndex + 1} - {endIndex} of{" "}
-						{totalCount}
+						Showing {totalCount === 0 ? 0 : startIndex + 1}-{endIndex} of {totalCount}
 					</div>
 
 					<div className="flex flex-col space-y-2 text-sm lg:flex-row lg:items-center lg:space-x-8 lg:space-y-0">

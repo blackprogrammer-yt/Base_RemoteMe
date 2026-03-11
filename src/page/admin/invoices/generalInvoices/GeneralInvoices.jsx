@@ -156,13 +156,13 @@ const GeneralInvoices = () => {
         switch (status) {
             case "paid":
                 return (
-                    <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-emerald-500/10 px-2 py-1 text-xs font-semibold uppercase text-emerald-700">
+                    <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-emerald-500/10 px-2 py-1 text-xs font-semibold uppercase text-emerald-700 dark:text-emerald-400">
                         Paid
                     </Badge>
                 );
             case "invoiced":
                 return (
-                    <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-sky-500/10 px-2 py-1 text-xs font-semibold uppercase text-sky-700">
+                    <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-sky-500/10 px-2 py-1 text-xs font-semibold uppercase text-sky-700 dark:text-sky-400">
                         Invoiced
                     </Badge>
                 );
@@ -189,7 +189,7 @@ const GeneralInvoices = () => {
                     </div>
                     <Button 
                         onClick={() => navigate(PROTECTED_ROUTES.ADMIN_CREATE_GENERAL_INVOICE)}
-                        className="bg-slate-900 hover:bg-slate-800 text-white rounded-md flex items-center gap-2"
+                        className="bg-primary hover:bg-primary/80 text-primary-foreground rounded-md flex items-center gap-2"
                     >
                         <Plus className="h-4 w-4" />
                         Create New Invoice
@@ -248,7 +248,7 @@ const GeneralInvoices = () => {
                                     <Filter className="h-4 w-4" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-40 bg-white">
+                            <DropdownMenuContent align="end" className="w-40 bg-popover">
                                     <DropdownMenuCheckboxItem
                                         checked={activeStatus === "all"}
                                         onCheckedChange={() => {
@@ -298,7 +298,7 @@ const GeneralInvoices = () => {
                                     <SlidersHorizontal className="h-4 w-4" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-32 bg-white">
+                            <DropdownMenuContent align="end" className="w-32 bg-popover">
                                     <DropdownMenuCheckboxItem
                                         checked={density === "compact"}
                                         onCheckedChange={() => setDensity("compact")}
@@ -329,7 +329,7 @@ const GeneralInvoices = () => {
                                     <Columns3 className="h-4 w-4" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-32 bg-white">
+                            <DropdownMenuContent align="end" className="w-32 bg-popover">
                                     <DropdownMenuCheckboxItem
                                         checked={viewMode === "table"}
                                         onCheckedChange={() => setViewMode("table")}
@@ -353,7 +353,7 @@ const GeneralInvoices = () => {
                                     <LayoutGrid className="h-4 w-4" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-56 bg-white">
+                            <DropdownMenuContent align="end" className="w-56 bg-popover">
                                     <DropdownMenuCheckboxItem
                                         checked={visibleColumns.invoiceNo}
                                         onCheckedChange={(v) => setVisibleColumns(prev => ({ ...prev, invoiceNo: v }))}
@@ -410,9 +410,9 @@ const GeneralInvoices = () => {
                                 <TableBody>
                                     {paginatedInvoices.map((inv) => (
                                         <TableRow key={inv.id} className="hover:bg-muted/30">
-                                        {visibleColumns.invoiceNo && <TableCell className={`font-medium text-slate-900 ${rowPaddingClass}`}>{inv.invoiceNo}</TableCell>}
-                                        {visibleColumns.to && <TableCell className={`text-slate-600 ${rowPaddingClass}`}>{inv.to}</TableCell>}
-                                        {visibleColumns.amount && <TableCell className={`font-semibold text-slate-900 ${rowPaddingClass}`}>{formatAmount(inv.amount)}</TableCell>}
+                                        {visibleColumns.invoiceNo && <TableCell className={`font-medium text-foreground ${rowPaddingClass}`}>{inv.invoiceNo}</TableCell>}
+                                        {visibleColumns.to && <TableCell className={`text-muted-foreground ${rowPaddingClass}`}>{inv.to}</TableCell>}
+                                        {visibleColumns.amount && <TableCell className={`font-semibold text-foreground ${rowPaddingClass}`}>{formatAmount(inv.amount)}</TableCell>}
                                         {visibleColumns.status && <TableCell className={`text-center ${rowPaddingClass}`}>{getStatusBadge(inv.status)}</TableCell>}
                                         {visibleColumns.action && (
                                             <TableCell className={`text-left ${rowPaddingClass}`}>
@@ -480,22 +480,22 @@ const GeneralInvoices = () => {
                                     <CardContent className="p-4">
                                         <div className="flex justify-between items-start mb-4">
                                             <div>
-                                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Invoice #</p>
-                                                <p className="font-bold text-slate-900">{inv.invoiceNo}</p>
+                                                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Invoice #</p>
+                                                <p className="font-bold text-foreground">{inv.invoiceNo}</p>
                                             </div>
                                             {getStatusBadge(inv.status)}
                                         </div>
                                         <div className="space-y-3 mb-6">
                                             <div>
-                                                <p className="text-xs text-slate-400 font-medium">To</p>
-                                                <p className="text-sm font-semibold text-slate-700">{inv.to}</p>
+                                                <p className="text-xs text-muted-foreground font-medium">To</p>
+                                                <p className="text-sm font-semibold text-foreground">{inv.to}</p>
                                             </div>
                                             <div>
-                                                <p className="text-xs text-slate-400 font-medium">Amount</p>
-                                                <p className="text-lg font-black text-slate-900">{formatAmount(inv.amount)}</p>
+                                                <p className="text-xs text-muted-foreground font-medium">Amount</p>
+                                                <p className="text-lg font-black text-foreground">{formatAmount(inv.amount)}</p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2 pt-4 border-t border-slate-100">
+                                        <div className="flex items-center gap-2 pt-4 border-t">
                                             <Button 
                                                 variant="outline"
                                                 size="sm"

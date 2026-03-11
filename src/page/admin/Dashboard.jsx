@@ -76,7 +76,7 @@ const AdminDashboard = () => {
                     return (
                         <Card
                             key={item.label}
-                            className="relative flex flex-auto flex-col overflow-hidden rounded-xl border-0 bg-white shadow-sm dark:bg-slate-900"
+                            className="relative flex flex-auto flex-col overflow-hidden rounded-xl border-0 bg-card shadow-sm dark:border dark:border-border/50"
                         >
                             <CardContent className="flex flex-col p-6">
                                 <div className="mb-4 flex items-center gap-3">
@@ -102,8 +102,8 @@ const AdminDashboard = () => {
             </section>
 
             <section className="mb-8">
-                <Card className="rounded-xl border-0 bg-white shadow-sm dark:bg-slate-900">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 border-b border-slate-200 pb-4 dark:border-slate-800">
+                <Card className="rounded-xl border-0 bg-card shadow-sm dark:border dark:border-border/50">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 border-b pb-4">
                         <div>
                             <CardTitle className="text-lg font-bold leading-6">
                                 Quick Actions
@@ -129,8 +129,8 @@ const AdminDashboard = () => {
             </section>
 
             <section>
-                <Card className="rounded-xl border-0 bg-white shadow-sm dark:bg-slate-900">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 border-b border-slate-200 pb-4 dark:border-slate-800">
+                <Card className="rounded-xl border-0 bg-card shadow-sm dark:border dark:border-border/50">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 border-b pb-4">
                         <div>
                             <CardTitle className="text-lg font-bold leading-6">System Overview</CardTitle>
                             <CardDescription className="text-sm">
@@ -143,7 +143,7 @@ const AdminDashboard = () => {
                         </Button>
                     </CardHeader>
                     <CardContent className="grid gap-4 p-6 md:grid-cols-2">
-                        <div className="relative overflow-hidden rounded-xl bg-slate-100/50 p-6 dark:bg-slate-800/50">
+                        <div className="relative overflow-hidden rounded-xl bg-muted/50 p-6">
                             <p className="text-sm font-medium text-muted-foreground">
                                 Total Organizations
                             </p>
@@ -152,7 +152,7 @@ const AdminDashboard = () => {
                                 organizations registered
                             </p>
                         </div>
-                        <div className="relative overflow-hidden rounded-xl bg-slate-100/50 p-6 dark:bg-slate-800/50">
+                        <div className="relative overflow-hidden rounded-xl bg-muted/50 p-6">
                             <p className="text-sm font-medium text-muted-foreground">
                                 Total Employees
                             </p>

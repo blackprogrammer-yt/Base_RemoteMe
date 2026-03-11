@@ -55,12 +55,12 @@ const EditDocument = () => {
             <div className="flex flex-auto flex-col py-2">
                 <div className="flex min-w-0 flex-auto flex-col gap-2 sm:flex-row sm:items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <h2 className="text-2xl font-bold tracking-tight text-slate-800">
+                        <h2 className="text-2xl font-bold tracking-tight text-foreground">
                             Edit Document
                         </h2>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Button onClick={handleSave} className="gap-2 bg-slate-900 hover:bg-slate-800 text-white">
+                        <Button onClick={handleSave} className="gap-2 bg-primary hover:bg-primary/90">
                             <Save className="h-4 w-4" />
                             Save
                         </Button>
@@ -78,7 +78,7 @@ const EditDocument = () => {
                 </div>
             </div>
 
-            <div className="rounded-xl border bg-card shadow-sm">
+            <div className="rounded-xl border bg-card shadow-sm dark:border dark:border-border/50">
                 <div className="p-4 grid grid-cols-1 gap-6">
                     <div className="grid grid-cols-1 gap-4">
                         <div className="grid gap-2">
@@ -148,7 +148,7 @@ const EditDocument = () => {
                             <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-8 px-3 text-xs border-emerald-200 text-emerald-600 hover:bg-emerald-50"
+                                className="h-8 px-3 text-xs"
                             >
                                 <Download className="mr-1.5 h-4 w-4" />
                                 Download
@@ -158,7 +158,7 @@ const EditDocument = () => {
 
                     <div className="grid gap-4">
                         <div className="text-sm font-semibold">Place Signatures:</div>
-                        <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                        <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                             PDF Preview & Field Placement
                         </div>
                         <div className="text-sm text-muted-foreground">
@@ -170,7 +170,7 @@ const EditDocument = () => {
                                 <div className="flex flex-col gap-2">
                                     <Button
                                         variant="outline"
-                                        className="h-9 justify-center gap-2 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                                        className="h-9 justify-center gap-2"
                                         onClick={() => handleAddField("signature")}
                                     >
                                         <Plus className="h-4 w-4" />
@@ -178,7 +178,7 @@ const EditDocument = () => {
                                     </Button>
                                     <Button
                                         variant="outline"
-                                        className="h-9 justify-center gap-2 border-sky-200 text-sky-700 hover:bg-sky-50"
+                                        className="h-9 justify-center gap-2"
                                         onClick={() => handleAddField("input")}
                                     >
                                         <Plus className="h-4 w-4" />
@@ -186,7 +186,7 @@ const EditDocument = () => {
                                     </Button>
                                 </div>
 
-                                <Card className="border-slate-200">
+                                <Card className="dark:border dark:border-border/50">
                                     <CardContent className="p-3">
                                         <div className="text-sm font-semibold mb-2">
                                             Page Navigation
@@ -198,14 +198,14 @@ const EditDocument = () => {
                                             <Button size="sm" variant="outline" className="h-7 px-3">
                                                 Page 1
                                             </Button>
-                                            <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-emerald-500/10 px-2 py-1 text-[10px] font-semibold uppercase text-emerald-700">
+                                            <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-emerald-500/10 px-2 py-1 text-[10px] font-semibold uppercase text-emerald-700 dark:text-emerald-400">
                                                 1
                                             </Badge>
                                         </div>
                                     </CardContent>
                                 </Card>
 
-                                <Card className="border-slate-200">
+                                <Card className="dark:border dark:border-border/50">
                                     <CardContent className="p-3">
                                         <div className="text-sm font-semibold mb-2">
                                             Fields on Page 1
@@ -243,9 +243,9 @@ const EditDocument = () => {
                             </div>
 
                             <div className="lg:col-span-9">
-                                <Card className="border-slate-200">
+                                <Card className="dark:border dark:border-border/50">
                                     <CardContent className="p-0">
-                                        <div className="h-[640px] w-full overflow-auto border-t bg-white">
+                                        <div className="h-[640px] w-full overflow-auto border-t bg-muted/20">
                                             <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
                                                 PDF preview placeholder
                                             </div>

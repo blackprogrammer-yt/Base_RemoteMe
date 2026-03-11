@@ -60,7 +60,7 @@ const PayrollPayment = () => {
     return (
         <main className="flex flex-1 flex-col py-4 md:pt-3">
             {/* Header */}
-            <section className="mb-8 flex items-center justify-between">
+            <section className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
                         <Folder className="h-5 w-5" />
@@ -75,7 +75,7 @@ const PayrollPayment = () => {
             </section>
 
             {/* Filter Section */}
-            <section className="mb-8">
+            <section className="mb-4">
                 <div className="flex items-center gap-3">
                     <Label className="text-base font-medium text-foreground">
                         Filter by Month:
@@ -106,7 +106,7 @@ const PayrollPayment = () => {
             </section>
 
             {/* Payment Cycles Grid */}
-            <section className="grid gap-6 md:grid-cols-2">
+            <section className="grid gap-4 md:grid-cols-2">
                 {paymentCycles.map((cycle) => (
                     <Card
                         key={cycle.id}
@@ -118,37 +118,37 @@ const PayrollPayment = () => {
                                 )
                             )
                         }
-                        className="relative overflow-hidden rounded-xl border-0 bg-white shadow-sm cursor-pointer transition-all hover:shadow-md dark:bg-slate-900"
+                        className="relative overflow-hidden rounded-lg border shadow-sm cursor-pointer transition-all hover:shadow-md"
                     >
                         {/* Card Header */}
                         <div
                             className={cn(
-                                "flex items-center justify-between px-6 py-4 text-white",
+                                "flex items-center justify-between px-4 py-3 text-white",
                                 cycle.bgColor
                             )}
                         >
-                            <div className="flex items-center gap-2.5">
-                                <Folder className="h-5 w-5" />
-                                <span className="text-lg font-bold tracking-tight">
+                            <div className="flex items-center gap-2">
+                                <Folder className="h-4 w-4" />
+                                <span className="text-base font-bold tracking-tight">
                                     {cycle.month}
                                 </span>
                             </div>
-                            <span className="inline-flex items-center rounded-full bg-white/20 px-3 py-1 text-xs font-bold uppercase tracking-wide">
+                            <span className="inline-flex items-center rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide">
                                 Status: {cycle.status}
                             </span>
                         </div>
 
-                        <CardContent className="p-6">
-                            <div className="flex flex-row flex-wrap gap-8">
+                        <CardContent className="p-4">
+                            <div className="flex flex-row flex-wrap gap-6">
                                 {/* Cycle Dates */}
                                 <div>
-                                    <div className="mb-2 flex items-center gap-2">
+                                    <div className="mb-1.5 flex items-center gap-2">
                                         <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-                                        <span className="text-sm font-semibold text-foreground">
+                                        <span className="text-xs font-semibold text-foreground">
                                             Cycle
                                         </span>
                                     </div>
-                                    <div className="ml-6 space-y-1.5 text-sm">
+                                    <div className="ml-6 space-y-1 text-xs">
                                         <div className="flex items-center gap-2">
                                             <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground" />
                                             <span className="text-muted-foreground">
@@ -172,17 +172,17 @@ const PayrollPayment = () => {
 
                                 {/* Contract Amount */}
                                 <div>
-                                    <div className="mb-2 flex items-center gap-2">
+                                    <div className="mb-1.5 flex items-center gap-2">
                                         <DollarSign className="h-4 w-4 text-muted-foreground" />
-                                        <span className="text-sm font-semibold text-foreground">
+                                        <span className="text-xs font-semibold text-foreground">
                                             Contract Amount
                                         </span>
                                     </div>
                                     <div className="ml-6 space-y-0.5">
-                                        <div className="text-2xl font-bold tracking-tight text-blue-600">
+                                        <div className="text-xl font-bold tracking-tight text-blue-600">
                                             {cycle.contractAmount.primary}
                                         </div>
-                                        <div className="text-base font-semibold text-blue-500">
+                                        <div className="text-sm font-semibold text-blue-500">
                                             {cycle.contractAmount.secondary}
                                         </div>
                                     </div>
@@ -190,17 +190,17 @@ const PayrollPayment = () => {
 
                                 {/* Invoice Amount */}
                                 <div>
-                                    <div className="mb-2 flex items-center gap-2">
+                                    <div className="mb-1.5 flex items-center gap-2">
                                         <FileText className="h-4 w-4 text-muted-foreground" />
-                                        <span className="text-sm font-semibold text-foreground">
+                                        <span className="text-xs font-semibold text-foreground">
                                             Invoice Amount
                                         </span>
                                     </div>
                                     <div className="ml-6 space-y-0.5">
-                                        <div className="text-2xl font-bold tracking-tight text-emerald-600">
+                                        <div className="text-xl font-bold tracking-tight text-emerald-600">
                                             {cycle.invoiceAmount.primary}
                                         </div>
-                                        <div className="text-base font-semibold text-emerald-500">
+                                        <div className="text-sm font-semibold text-emerald-500">
                                             {cycle.invoiceAmount.secondary}
                                         </div>
                                     </div>

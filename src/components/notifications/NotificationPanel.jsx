@@ -102,16 +102,16 @@ const NotificationPanel = () => {
                 </Button>
             </SheetTrigger>
 
-            <SheetContent side="right" className="w-[320px] border-l-0 bg-[#eff1f4] p-0 sm:max-w-[320px]">
+            <SheetContent side="right" className="w-[320px] border-l-0 bg-muted/50 p-0 sm:max-w-[320px]">
                 <ScrollArea className="h-full px-4 pb-4">
                     {hasNotifications ? (
                         <div className="pt-16">
                             <div className="mb-4 flex items-end justify-between">
-                                <h2 className="text-2xl font-bold leading-none text-[#111827]">Notifications</h2>
+                                <h2 className="text-2xl font-bold leading-none text-foreground">Notifications</h2>
                                 <button
                                     type="button"
                                     onClick={dismissAll}
-                                    className="text-[12px] text-[#1f4f96] underline"
+                                    className="text-[12px] text-primary underline hover:text-primary/80"
                                 >
                                     dismiss all
                                 </button>

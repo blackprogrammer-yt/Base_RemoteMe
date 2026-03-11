@@ -60,13 +60,13 @@ const AddCurrency = () => {
                 <div className="flex min-w-0 flex-auto flex-col gap-2 sm:flex-row sm:items-center justify-between">
                     <div className="flex items-center gap-2">
                         <Banknote className="h-6 w-6 text-primary" />
-                        <h2 className="text-2xl font-bold tracking-tight text-slate-800">
+                        <h2 className="text-2xl font-bold tracking-tight text-foreground">
                             Add Currency
                         </h2>
                     </div>
                     <Button
                         variant="default"
-                        className="h-9 gap-2 bg-slate-900 hover:bg-slate-800 text-white border-none"
+                        className="h-9 gap-2 bg-primary hover:bg-primary/90 border-none"
                         onClick={handleBack}
                     >
                         <ArrowLeft className="h-4 w-4" />
@@ -75,30 +75,30 @@ const AddCurrency = () => {
                 </div>
             </div>
 
-            <div className="rounded-lg border bg-white shadow-sm overflow-hidden">
+            <div className="rounded-lg border bg-card shadow-sm overflow-hidden dark:border dark:border-border/50">
                 <div className="p-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         {/* Row 1 */}
                         <div className="space-y-2">
-                            <Label htmlFor="name" className="text-sm font-medium text-slate-700">
+                            <Label htmlFor="name" className="text-sm font-medium text-muted-foreground">
                                 Name <span className="text-red-500">*</span>
                             </Label>
                             <Input
                                 id="name"
                                 value={formData.name}
                                 onChange={handleChange}
-                                className="h-10 border-slate-200 focus:border-primary focus:ring-primary/20"
+                                className="h-10"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="code" className="text-sm font-medium text-slate-700">
+                            <Label htmlFor="code" className="text-sm font-medium text-muted-foreground">
                                 Code <span className="text-red-500">*</span>
                             </Label>
                             <Input
                                 id="code"
                                 value={formData.code}
                                 onChange={handleChange}
-                                className="h-10 border-slate-200 focus:border-primary focus:ring-primary/20"
+                                className="h-10"
                             />
                         </div>
                     </div>
@@ -106,36 +106,36 @@ const AddCurrency = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                         {/* Row 2 */}
                         <div className="space-y-2">
-                            <Label htmlFor="code2" className="text-sm font-medium text-slate-700">
+                            <Label htmlFor="code2" className="text-sm font-medium text-muted-foreground">
                                 Code2 <span className="text-red-500">*</span>
                             </Label>
                             <Input
                                 id="code2"
                                 value={formData.code2}
                                 onChange={handleChange}
-                                className="h-10 border-slate-200 focus:border-primary focus:ring-primary/20"
+                                className="h-10"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="symbol" className="text-sm font-medium text-slate-700">
+                            <Label htmlFor="symbol" className="text-sm font-medium text-muted-foreground">
                                 Symbol <span className="text-red-500">*</span>
                             </Label>
                             <Input
                                 id="symbol"
                                 value={formData.symbol}
                                 onChange={handleChange}
-                                className="h-10 border-slate-200 focus:border-primary focus:ring-primary/20"
+                                className="h-10"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="subUnitName" className="text-sm font-medium text-slate-700">
+                            <Label htmlFor="subUnitName" className="text-sm font-medium text-muted-foreground">
                                 Sub Unit Name <span className="text-red-500">*</span>
                             </Label>
                             <Input
                                 id="subUnitName"
                                 value={formData.subUnitName}
                                 onChange={handleChange}
-                                className="h-10 border-slate-200 focus:border-primary focus:ring-primary/20"
+                                className="h-10"
                             />
                         </div>
                     </div>
@@ -143,19 +143,19 @@ const AddCurrency = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end mb-8">
                         {/* Row 3 */}
                         <div className="space-y-2">
-                            <Label htmlFor="exchangeRate" className="text-sm font-medium text-slate-700">
+                            <Label htmlFor="exchangeRate" className="text-sm font-medium text-muted-foreground">
                                 Exchange Rate <span className="text-red-500">*</span>
                             </Label>
                             <Input
                                 id="exchangeRate"
                                 value={formData.exchangeRate}
                                 onChange={handleChange}
-                                className="h-10 border-slate-200 focus:border-primary focus:ring-primary/20"
+                                className="h-10"
                             />
                         </div>
                         <div className="space-y-2 pb-2">
-                            <p className="text-sm font-medium text-slate-700">Base Currency:</p>
-                            <Badge className="bg-slate-600 hover:bg-slate-700 text-white font-normal px-3 py-1">
+                            <p className="text-sm font-medium text-muted-foreground">Base Currency:</p>
+                            <Badge className="bg-primary hover:bg-primary/90 font-normal px-3 py-1">
                                 UAE Dirham (د.إ)
                             </Badge>
                         </div>
@@ -164,7 +164,7 @@ const AddCurrency = () => {
                     <div className="flex justify-end pt-4">
                         <Button
                             onClick={handleSave}
-                            className="h-10 px-8 bg-slate-900 hover:bg-slate-800 text-white"
+                            className="h-10 px-8 bg-primary hover:bg-primary/90"
                         >
                             Add
                         </Button>

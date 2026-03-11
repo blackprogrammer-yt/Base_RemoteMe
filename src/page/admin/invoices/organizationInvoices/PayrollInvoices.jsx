@@ -164,14 +164,14 @@ const PayrollInvoices = () => {
             case "paid":
                 return (
                     <div className="flex items-center justify-center gap-2">
-                        <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-emerald-500/10 px-2 py-1 text-xs font-semibold uppercase text-emerald-700">
+                        <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-emerald-500/10 px-2 py-1 text-xs font-semibold uppercase text-emerald-700 dark:text-emerald-400">
                             Paid
                         </Badge>
                         <a 
                             href="about:blank" 
                             target="_blank" 
                             rel="noreferrer"
-                            className="text-xs text-slate-400 underline cursor-pointer hover:text-slate-600 transition-colors"
+                            className="text-xs text-muted-foreground underline cursor-pointer hover:text-foreground transition-colors"
                         >
                             View Receipt
                         </a>
@@ -179,7 +179,7 @@ const PayrollInvoices = () => {
                 );
             case "pending":
                 return (
-                    <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-amber-500/10 px-2 py-1 text-xs font-semibold uppercase text-amber-700">
+                    <Badge className="pointer-events-none inline-flex items-center rounded-sm border-0 bg-amber-500/10 px-2 py-1 text-xs font-semibold uppercase text-amber-700 dark:text-amber-400">
                         Pending
                     </Badge>
                 );
@@ -258,7 +258,7 @@ const PayrollInvoices = () => {
                                     <Filter className="h-4 w-4" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-40 bg-white">
+                            <DropdownMenuContent align="end" className="w-40 bg-popover">
                                     {statusFilterOptions.map((option) => (
                                         <DropdownMenuCheckboxItem
                                             key={option.key}
@@ -281,7 +281,7 @@ const PayrollInvoices = () => {
                                     <SlidersHorizontal className="h-4 w-4" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-32 bg-white">
+                            <DropdownMenuContent align="end" className="w-32 bg-popover">
                                     <DropdownMenuCheckboxItem
                                         checked={density === "compact"}
                                         onCheckedChange={() => setDensity("compact")}
@@ -312,7 +312,7 @@ const PayrollInvoices = () => {
                                     <Columns3 className="h-4 w-4" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-32 bg-white">
+                            <DropdownMenuContent align="end" className="w-32 bg-popover">
                                     <DropdownMenuCheckboxItem
                                         checked={viewMode === "table"}
                                         onCheckedChange={() => setViewMode("table")}
@@ -336,7 +336,7 @@ const PayrollInvoices = () => {
                                     <LayoutGrid className="h-4 w-4" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-56 bg-white">
+                            <DropdownMenuContent align="end" className="w-56 bg-popover">
                                     {Object.keys(visibleColumns).map((col) => (
                                         <DropdownMenuCheckboxItem
                                             key={col}
@@ -370,11 +370,11 @@ const PayrollInvoices = () => {
                                 <TableBody>
                                     {paginatedInvoices.map((inv) => (
                                         <TableRow key={inv.id} className="hover:bg-muted/30">
-                                        {visibleColumns.invoiceNo && <TableCell className={`font-medium text-slate-900 ${rowPaddingClass}`}>{inv.invoiceNo}</TableCell>}
-                                        {visibleColumns.to && <TableCell className={`text-slate-600 ${rowPaddingClass}`}>{inv.to}</TableCell>}
-                                        {visibleColumns.cycle && <TableCell className={`text-slate-600 ${rowPaddingClass}`}>{inv.cycle}</TableCell>}
-                                        {visibleColumns.amount && <TableCell className={`font-semibold text-slate-900 ${rowPaddingClass}`}>{formatAmount(inv.amount)}</TableCell>}
-                                        {visibleColumns.payable && <TableCell className={`font-semibold text-slate-900 ${rowPaddingClass}`}>{formatAmount(inv.payable)}</TableCell>}
+                                        {visibleColumns.invoiceNo && <TableCell className={`font-medium text-foreground ${rowPaddingClass}`}>{inv.invoiceNo}</TableCell>}
+                                        {visibleColumns.to && <TableCell className={`text-muted-foreground ${rowPaddingClass}`}>{inv.to}</TableCell>}
+                                        {visibleColumns.cycle && <TableCell className={`text-muted-foreground ${rowPaddingClass}`}>{inv.cycle}</TableCell>}
+                                        {visibleColumns.amount && <TableCell className={`font-semibold text-foreground ${rowPaddingClass}`}>{formatAmount(inv.amount)}</TableCell>}
+                                        {visibleColumns.payable && <TableCell className={`font-semibold text-foreground ${rowPaddingClass}`}>{formatAmount(inv.payable)}</TableCell>}
                                         {visibleColumns.status && <TableCell className={`text-center ${rowPaddingClass}`}>{getStatusBadge(inv.status)}</TableCell>}
                                         {visibleColumns.action && (
                                             <TableCell className={`text-center ${rowPaddingClass}`}>
@@ -442,28 +442,28 @@ const PayrollInvoices = () => {
                                     <CardContent className="p-4">
                                         <div className="flex justify-between items-start mb-4">
                                             <div>
-                                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Invoice #</p>
-                                                <p className="font-bold text-slate-900">{inv.invoiceNo}</p>
+                                                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Invoice #</p>
+                                                <p className="font-bold text-foreground">{inv.invoiceNo}</p>
                                             </div>
                                             {getStatusBadge(inv.status)}
                                         </div>
                                         <div className="space-y-3 mb-6">
                                             <div>
-                                                <p className="text-xs text-slate-400 font-medium">To</p>
-                                                <p className="text-sm font-semibold text-slate-700">{inv.to}</p>
+                                                <p className="text-xs text-muted-foreground font-medium">To</p>
+                                                <p className="text-sm font-semibold text-foreground">{inv.to}</p>
                                             </div>
                                             <div className="grid grid-cols-2 gap-2">
                                                 <div>
-                                                    <p className="text-xs text-slate-400 font-medium">Cycle</p>
-                                                    <p className="text-sm font-semibold text-slate-700">{inv.cycle}</p>
+                                                    <p className="text-xs text-muted-foreground font-medium">Cycle</p>
+                                                    <p className="text-sm font-semibold text-foreground">{inv.cycle}</p>
                                                 </div>
                                                 <div>
-                                                    <p className="text-xs text-slate-400 font-medium">Payable</p>
-                                                    <p className="text-sm font-black text-slate-900">{formatAmount(inv.payable)}</p>
+                                                    <p className="text-xs text-muted-foreground font-medium">Payable</p>
+                                                    <p className="text-sm font-black text-foreground">{formatAmount(inv.payable)}</p>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2 pt-4 border-t border-slate-100">
+                                        <div className="flex items-center gap-2 pt-4 border-t">
                                             <Button 
                                                 variant="outline"
                                                 size="sm"

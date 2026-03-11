@@ -7,7 +7,6 @@ import {
 	Columns3,
 	Eye,
 	FileText,
-	Filter,
 	LayoutGrid,
 	Search,
 	SlidersHorizontal,
@@ -233,7 +232,7 @@ const MyInvoices = () => {
 
 		if (key === "status") {
 			return (
-				<TableCell className={`px-4 text-sm ${rowPaddingClass}`}>
+				<TableCell className={`px-4 ${rowPaddingClass}`}>
 					{getStatusBadge(invoice.status)}
 				</TableCell>
 			);
@@ -241,12 +240,12 @@ const MyInvoices = () => {
 
 		if (key === "action") {
 			return (
-				<TableCell className={`px-4 text-sm ${rowPaddingClass}`}>
+				<TableCell className={`px-4 ${rowPaddingClass}`}>
 					<Button
 						type="button"
 						variant="outline"
 						size="sm"
-						className="h-7 gap-2 px-2.5 text-xs text-primary"
+						className="gap-2 px-3 text-xs"
 						onClick={() =>
 							navigate(`/organization/invoices/my-invoices/${invoice.id}`)
 						}
@@ -311,26 +310,6 @@ const MyInvoices = () => {
 								</button>
 							) : null}
 						</div>
-
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button variant="outline" size="icon" aria-label="Filter">
-									<Filter />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end">
-								{statusTabs.map((tab) => (
-									<DropdownMenuCheckboxItem
-										key={tab.key}
-										className="capitalize"
-										checked={selectedStatus === tab.key}
-										onCheckedChange={() => setSelectedStatus(tab.key)}
-									>
-										{tab.label}
-									</DropdownMenuCheckboxItem>
-								))}
-							</DropdownMenuContent>
-						</DropdownMenu>
 
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
@@ -426,10 +405,10 @@ const MyInvoices = () => {
 								</TableHeader>
 								<TableBody>
 									{paginatedInvoices.length > 0 ? (
-										paginatedInvoices.map((invoice, index) => (
+										paginatedInvoices.map((invoice) => (
 											<TableRow
 												key={invoice.id}
-												className={index % 2 === 0 ? "bg-muted/30" : "bg-background"}
+												className="hover:bg-muted/30"
 											>
 												{visibleColumnOrder.map((key) => (
 													<Fragment key={key}>
@@ -515,7 +494,7 @@ const MyInvoices = () => {
 
 				<div className="mt-4 flex flex-col justify-between gap-4 px-2 lg:flex-row lg:items-center">
 					<div className="flex-1 text-sm text-muted-foreground">
-						Showing {totalCount === 0 ? 0 : startIndex + 1} - {endIndex} of {totalCount}
+						Showing {totalCount === 0 ? 0 : startIndex + 1}-{endIndex} of {totalCount}
 					</div>
 
 					<div className="flex flex-col space-y-2 text-sm lg:flex-row lg:items-center lg:space-x-8 lg:space-y-0">

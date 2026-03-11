@@ -6,7 +6,6 @@ import {
 	ChevronsRight,
 	Columns3,
 	FileText,
-	Filter,
 	LayoutGrid,
 	Search,
 	SlidersHorizontal,
@@ -223,15 +222,6 @@ const GeneralInvoice = () => {
 		return "Pay";
 	};
 
-	const getActionClassName = (status) => {
-		const normalized = status?.toLowerCase();
-		if (normalized === "paid") {
-			return "border-emerald-200 text-emerald-600 hover:bg-emerald-50";
-		}
-
-		return "border-primary/40 text-primary hover:bg-primary/10";
-	};
-
 	const renderCell = (invoice, key) => {
 		if (key === "invoiceNo") {
 			return (
@@ -251,7 +241,7 @@ const GeneralInvoice = () => {
 
 		if (key === "status") {
 			return (
-				<TableCell className={`px-4 text-sm ${rowPaddingClass}`}>
+				<TableCell className={`px-4 ${rowPaddingClass}`}>
 					{getStatusBadge(invoice.status)}
 				</TableCell>
 			);
@@ -259,7 +249,7 @@ const GeneralInvoice = () => {
 
 		if (key === "action") {
 			return (
-				<TableCell className={`px-4 text-sm ${rowPaddingClass}`}>
+				<TableCell className={`px-4 ${rowPaddingClass}`}>
 					<Button
 						type="button"
 						variant="outline"
@@ -335,30 +325,6 @@ const GeneralInvoice = () => {
 								</button>
 							) : null}
 						</div>
-
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button
-									variant="outline"
-									size="icon"
-									aria-label="Filter"
-								>
-									<Filter />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end">
-								{statusTabs.map((tab) => (
-									<DropdownMenuCheckboxItem
-										key={tab.key}
-										className="capitalize"
-										checked={selectedStatus === tab.key}
-										onCheckedChange={() => setSelectedStatus(tab.key)}
-									>
-										{tab.label}
-									</DropdownMenuCheckboxItem>
-								))}
-							</DropdownMenuContent>
-						</DropdownMenu>
 
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
@@ -466,14 +432,10 @@ const GeneralInvoice = () => {
 								</TableHeader>
 								<TableBody>
 									{paginatedInvoices.length > 0 ? (
-										paginatedInvoices.map((invoice, index) => (
+										paginatedInvoices.map((invoice) => (
 											<TableRow
 												key={invoice.id}
-												className={
-													index % 2 === 0
-														? "bg-muted/30"
-														: "bg-background"
-												}
+												className="hover:bg-muted/30"
 											>
 												{visibleColumnOrder.map((key) => (
 													<Fragment key={key}>
@@ -556,7 +518,7 @@ const GeneralInvoice = () => {
 
 				<div className="mt-4 flex flex-col justify-between gap-4 px-2 lg:flex-row lg:items-center">
 					<div className="flex-1 text-sm text-muted-foreground">
-						Showing {totalCount === 0 ? 0 : startIndex + 1} - {endIndex} of {totalCount}
+						Showing {totalCount === 0 ? 0 : startIndex + 1}-{endIndex} of {totalCount}
 					</div>
 
 					<div className="flex flex-col space-y-2 text-sm lg:flex-row lg:items-center lg:space-x-8 lg:space-y-0">

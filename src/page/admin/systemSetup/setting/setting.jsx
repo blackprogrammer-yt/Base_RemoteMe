@@ -45,20 +45,28 @@ const Setting = () => {
     };
 
     return (
-        <main className="flex flex-1 flex-col gap-6 py-4 md:pt-3">
-            <div className="flex items-center gap-2">
-                <SettingsIcon className="h-6 w-6 text-primary" />
-                <h2 className="text-2xl font-bold tracking-tight text-slate-800">
-                    Settings
-                </h2>
+        <main className="flex flex-1 flex-col gap-4 py-4 md:pt-3">
+            <div className="flex flex-auto flex-col py-2">
+                <div className="flex min-w-0 flex-auto flex-col gap-2 sm:flex-row sm:items-center">
+                    <div className="flex items-center gap-2">
+                        <SettingsIcon className="h-5 w-5 text-muted-foreground" />
+                        <h2 className="text-2xl font-bold tracking-tight">
+                            Settings
+                        </h2>
+                    </div>
+                </div>
             </div>
 
-            <div className="rounded-xl border bg-white shadow-sm overflow-hidden">
-                <div className="p-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+            <div className="rounded-lg border bg-card px-3 py-4 shadow-sm md:px-4">
+                <form
+                    onSubmit={(e) => { e.preventDefault(); handleUpdate(); }}
+                    className="space-y-6"
+                    noValidate
+                >
+                    <div className="grid gap-4 md:grid-cols-2">
                         {/* Legal Name */}
-                        <div className="space-y-2">
-                            <Label htmlFor="legalName" className="text-sm font-medium text-slate-600">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="legalName" className="text-xs font-medium">
                                 Legal Name
                             </Label>
                             <Input
@@ -66,20 +74,20 @@ const Setting = () => {
                                 value={formData.legalName}
                                 onChange={handleChange}
                                 placeholder="Legal Name"
-                                className="h-11 border-slate-200 focus:border-primary focus:ring-primary/20 bg-slate-50/30"
+                                className="h-9"
                             />
                         </div>
 
                         {/* Payment Terms */}
-                        <div className="space-y-2">
-                            <Label htmlFor="paymentTerms" className="text-sm font-medium text-slate-600">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="paymentTerms" className="text-xs font-medium">
                                 Payment Terms (in days)
                             </Label>
                             <Select 
                                 value={formData.paymentTerms} 
                                 onValueChange={(value) => setFormData(prev => ({ ...prev, paymentTerms: value }))}
                             >
-                                <SelectTrigger className="h-11 border-slate-200 bg-slate-50/30">
+                                <SelectTrigger className="h-9">
                                     <SelectValue placeholder="Select terms" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -92,8 +100,8 @@ const Setting = () => {
                         </div>
 
                         {/* Business Email */}
-                        <div className="space-y-2">
-                            <Label htmlFor="businessEmail" className="text-sm font-medium text-slate-600">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="businessEmail" className="text-xs font-medium">
                                 Business Email
                             </Label>
                             <Input
@@ -101,13 +109,13 @@ const Setting = () => {
                                 value={formData.businessEmail}
                                 onChange={handleChange}
                                 placeholder="Business Email"
-                                className="h-11 border-slate-200 focus:border-primary focus:ring-primary/20 bg-slate-50/30"
+                                className="h-9"
                             />
                         </div>
 
                         {/* Contact Number */}
-                        <div className="space-y-2">
-                            <Label htmlFor="contactNumber" className="text-sm font-medium text-slate-600">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="contactNumber" className="text-xs font-medium">
                                 Contact Number
                             </Label>
                             <div className="relative">
@@ -120,25 +128,25 @@ const Setting = () => {
                                     value={formData.contactNumber}
                                     onChange={handleChange}
                                     placeholder="Contact Number"
-                                    className="h-11 pl-14 border-slate-200 focus:border-primary focus:ring-primary/20 bg-slate-50/30"
+                                    className="h-9 pl-14"
                                 />
                             </div>
                         </div>
 
                         {/* Default Currency */}
-                        <div className="space-y-2">
-                            <Label htmlFor="defaultCurrency" className="text-sm font-medium text-slate-600">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="defaultCurrency" className="text-xs font-medium">
                                 Default Currency
                             </Label>
                             <div className="relative">
-                                <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none">
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none z-10">
                                     <img src="https://flagcdn.com/w20/ae.png" alt="AE" className="w-4 h-3" />
                                 </div>
                                 <Select 
                                     value={formData.defaultCurrency} 
                                     onValueChange={(value) => setFormData(prev => ({ ...prev, defaultCurrency: value }))}
                                 >
-                                    <SelectTrigger className="h-11 pl-10 border-slate-200 bg-slate-50/30">
+                                    <SelectTrigger className="h-9 pl-10">
                                         <SelectValue placeholder="Select currency" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -152,8 +160,8 @@ const Setting = () => {
                         </div>
 
                         {/* VAT Number */}
-                        <div className="space-y-2">
-                            <Label htmlFor="vatNumber" className="text-sm font-medium text-slate-600">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="vatNumber" className="text-xs font-medium">
                                 VAT Number
                             </Label>
                             <Input
@@ -161,13 +169,13 @@ const Setting = () => {
                                 value={formData.vatNumber}
                                 onChange={handleChange}
                                 placeholder="VAT Number"
-                                className="h-11 border-slate-200 focus:border-primary focus:ring-primary/20 bg-slate-50/30"
+                                className="h-9"
                             />
                         </div>
 
                         {/* Bank Name */}
-                        <div className="space-y-2">
-                            <Label htmlFor="bankName" className="text-sm font-medium text-slate-600">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="bankName" className="text-xs font-medium">
                                 Bank Name
                             </Label>
                             <Input
@@ -175,13 +183,13 @@ const Setting = () => {
                                 value={formData.bankName}
                                 onChange={handleChange}
                                 placeholder="Bank Name"
-                                className="h-11 border-slate-200 focus:border-primary focus:ring-primary/20 bg-slate-50/30"
+                                className="h-9"
                             />
                         </div>
 
                         {/* Account Title */}
-                        <div className="space-y-2">
-                            <Label htmlFor="accountTitle" className="text-sm font-medium text-slate-600">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="accountTitle" className="text-xs font-medium">
                                 Account Title
                             </Label>
                             <Input
@@ -189,13 +197,13 @@ const Setting = () => {
                                 value={formData.accountTitle}
                                 onChange={handleChange}
                                 placeholder="Account Title"
-                                className="h-11 border-slate-200 focus:border-primary focus:ring-primary/20 bg-slate-50/30"
+                                className="h-9"
                             />
                         </div>
 
                         {/* IBAN */}
-                        <div className="space-y-2">
-                            <Label htmlFor="iban" className="text-sm font-medium text-slate-600">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="iban" className="text-xs font-medium">
                                 IBAN
                             </Label>
                             <Input
@@ -203,13 +211,13 @@ const Setting = () => {
                                 value={formData.iban}
                                 onChange={handleChange}
                                 placeholder="IBAN"
-                                className="h-11 border-slate-200 focus:border-primary focus:ring-primary/20 bg-slate-50/30"
+                                className="h-9"
                             />
                         </div>
 
                         {/* Swift Code */}
-                        <div className="space-y-2">
-                            <Label htmlFor="swiftCode" className="text-sm font-medium text-slate-600">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="swiftCode" className="text-xs font-medium">
                                 Swift Code
                             </Label>
                             <Input
@@ -217,13 +225,13 @@ const Setting = () => {
                                 value={formData.swiftCode}
                                 onChange={handleChange}
                                 placeholder="Swift Code"
-                                className="h-11 border-slate-200 focus:border-primary focus:ring-primary/20 bg-slate-50/30"
+                                className="h-9"
                             />
                         </div>
 
                         {/* Bank Phone */}
-                        <div className="space-y-2">
-                            <Label htmlFor="bankPhone" className="text-sm font-medium text-slate-600">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="bankPhone" className="text-xs font-medium">
                                 Bank Phone
                             </Label>
                             <div className="relative">
@@ -236,14 +244,14 @@ const Setting = () => {
                                     value={formData.bankPhone}
                                     onChange={handleChange}
                                     placeholder="Bank Phone"
-                                    className="h-11 pl-14 border-slate-200 focus:border-primary focus:ring-primary/20 bg-slate-50/30"
+                                    className="h-9 pl-14"
                                 />
                             </div>
                         </div>
 
                         {/* Bank Address */}
-                        <div className="space-y-2">
-                            <Label htmlFor="bankAddress" className="text-sm font-medium text-slate-600">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="bankAddress" className="text-xs font-medium">
                                 Bank Address
                             </Label>
                             <Input
@@ -251,13 +259,13 @@ const Setting = () => {
                                 value={formData.bankAddress}
                                 onChange={handleChange}
                                 placeholder="Bank Address"
-                                className="h-11 border-slate-200 focus:border-primary focus:ring-primary/20 bg-slate-50/30"
+                                className="h-9"
                             />
                         </div>
 
                         {/* Beneficiary Name */}
-                        <div className="space-y-2">
-                            <Label htmlFor="beneficiaryName" className="text-sm font-medium text-slate-600">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="beneficiaryName" className="text-xs font-medium">
                                 Beneficiary Name
                             </Label>
                             <Input
@@ -265,13 +273,13 @@ const Setting = () => {
                                 value={formData.beneficiaryName}
                                 onChange={handleChange}
                                 placeholder="Beneficiary Name"
-                                className="h-11 border-slate-200 focus:border-primary focus:ring-primary/20 bg-slate-50/30"
+                                className="h-9"
                             />
                         </div>
 
                         {/* Beneficiary Address */}
-                        <div className="space-y-2">
-                            <Label htmlFor="beneficiaryAddress" className="text-sm font-medium text-slate-600">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="beneficiaryAddress" className="text-xs font-medium">
                                 Beneficiary Address
                             </Label>
                             <Input
@@ -279,20 +287,21 @@ const Setting = () => {
                                 value={formData.beneficiaryAddress}
                                 onChange={handleChange}
                                 placeholder="Beneficiary Address"
-                                className="h-11 border-slate-200 focus:border-primary focus:ring-primary/20 bg-slate-50/30"
+                                className="h-9"
                             />
                         </div>
                     </div>
 
-                    <div className="flex justify-end pt-8">
+                    <div className="flex justify-end">
                         <Button
-                            onClick={handleUpdate}
-                            className="h-11 px-8 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg"
+                            type="submit"
+                            size="lg"
+                            className="px-6"
                         >
                             Update Settings
                         </Button>
                     </div>
-                </div>
+                </form>
             </div>
         </main>
     );
